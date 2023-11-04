@@ -1,4 +1,4 @@
-namespace api;
+namespace DiagramEditor.Services;
 
 public class WeatherForecast
 {
