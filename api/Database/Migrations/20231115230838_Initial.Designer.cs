@@ -11,7 +11,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace DiagramEditor.Database.Migrations
 {
     [DbContext(typeof(ApplicationContext))]
-    [Migration("20231105173508_Initial")]
+    [Migration("20231115230838_Initial")]
     partial class Initial
     {
         /// <inheritdoc />
@@ -41,7 +41,7 @@ namespace DiagramEditor.Database.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("AdminNote");
+                    b.ToTable("AdminNotes");
                 });
 
             modelBuilder.Entity("DiagramEditor.Database.Models.Diagram", b =>
@@ -70,7 +70,7 @@ namespace DiagramEditor.Database.Migrations
 
                     b.HasIndex("CreatorId");
 
-                    b.ToTable("Diagram");
+                    b.ToTable("Diagrams");
                 });
 
             modelBuilder.Entity("DiagramEditor.Database.Models.DiagramAccess", b =>
@@ -178,14 +178,18 @@ namespace DiagramEditor.Database.Migrations
                     b.Property<DateTime>("CreatedDate")
                         .HasColumnType("datetime(6)");
 
-                    b.Property<string>("Email")
+                    b.Property<string>("DisplayName")
                         .IsRequired()
                         .HasColumnType("longtext");
 
                     b.Property<bool>("IsAdmin")
                         .HasColumnType("tinyint(1)");
 
-                    b.Property<string>("Name")
+                    b.Property<string>("Login")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("PasswordHash")
                         .IsRequired()
                         .HasColumnType("longtext");
 

@@ -1,8 +1,10 @@
+using DiagramEditor.Attributes;
 using DiagramEditor.Database.Models;
 using Microsoft.EntityFrameworkCore;
 
 namespace DiagramEditor.Database;
 
+[Injectable(ServiceLifetime.Transient)]
 public sealed class ApplicationContext : DbContext
 {
     public DbSet<User> Users { get; set; } = null!;
