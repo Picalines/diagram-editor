@@ -1,7 +1,8 @@
 using CSharpFunctionalExtensions;
 using DiagramEditor.Controllers.Requests;
 using DiagramEditor.Extensions;
-using DiagramEditor.Services;
+using DiagramEditor.Repositories;
+using DiagramEditor.Services.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -9,13 +10,13 @@ namespace DiagramEditor.Controllers;
 
 [ApiController]
 [Route("[controller]")]
-public sealed class UserController(UserService users) : ControllerBase
+public sealed class UserController(IUserRepository users, IAuthenticator auth) : ControllerBase
 {
     [Authorize]
     [HttpGet]
     public IActionResult GetCurrent()
     {
-        return users.GetCurrent(User).MatchAction(Ok, Unauthorized);
+        return auth.GetCurrentUser().MatchAction(Ok, Unauthorized);
     }
 
     [Authorize]
@@ -35,7 +36,7 @@ public sealed class UserController(UserService users) : ControllerBase
         }
 
         return users
-            .CreateUser(register.Login, register.Password)
+            .Create(register.Login, register.Password)
             .MatchAction(Ok, creationError => BadRequest(new { reason = creationError }));
     }
 
@@ -48,8 +49,7 @@ public sealed class UserController(UserService users) : ControllerBase
             return BadRequest(ModelState);
         }
 
-        return users
-            .Authenticate(login.Login, login.Password)
+        return auth.Authenticate(login.Login, login.Password)
             .Map(pair => pair.Token)
             .MatchAction(token => Ok(new { token }), Unauthorized);
     }

@@ -1,27 +1,17 @@
-using System.Security.Claims;
 using CSharpFunctionalExtensions;
 using DiagramEditor.Attributes;
 using DiagramEditor.Database;
 using DiagramEditor.Database.Models;
-using DiagramEditor.Extensions;
-using DiagramEditor.Services.Authentication;
 using DiagramEditor.Services.Passwords;
 
-namespace DiagramEditor.Services;
-
-public enum UserCreationError
-{
-    LoginTaken,
-    InvalidPassword,
-}
+namespace DiagramEditor.Repositories;
 
 [Injectable(ServiceLifetime.Singleton)]
-public sealed class UserService(
+public sealed class UserRepository(
     ApplicationContext context,
-    IAuthenticationService authentication,
     IPasswordHasher passwordHasher,
     IPasswordValidator passwordValidator
-)
+) : IUserRepository
 {
     public Maybe<User> GetById(int id)
     {
@@ -33,24 +23,7 @@ public sealed class UserService(
         return context.Users.SingleOrDefault(user => user.Login == login).AsMaybe();
     }
 
-    public Maybe<User> GetCurrent(ClaimsPrincipal principal)
-    {
-        return principal
-            .Claims
-            .FirstOrDefault(claim => claim.Type is "id")
-            .AsMaybe()
-            .Bind(idClaim => idClaim.Value.MaybeParse<int>())
-            .Bind(GetById);
-    }
-
-    public Maybe<(User User, string Token)> Authenticate(string login, string passwordText)
-    {
-        return GetByLogin(login)
-            .Where(user => passwordHasher.Verify(passwordText, user.PasswordHash))
-            .Map(user => (user, authentication.GenerateToken(user)));
-    }
-
-    public Result<User, UserCreationError> CreateUser(string login, string passwordText)
+    public Result<User, UserCreationError> Create(string login, string passwordText)
     {
         if (context.Users.Any(user => user.Login == login))
         {
