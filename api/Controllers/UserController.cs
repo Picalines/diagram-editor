@@ -21,7 +21,7 @@ public sealed class UserController(IUserRepository users, IAuthenticator auth) :
 
     [Authorize]
     [HttpPut]
-    public IActionResult EditCurrent()
+    public IActionResult UpdateCurrent()
     {
         throw new NotImplementedException();
     }
@@ -49,9 +49,13 @@ public sealed class UserController(IUserRepository users, IAuthenticator auth) :
             return BadRequest(ModelState);
         }
 
-        return auth.Authenticate(login.Login, login.Password)
-            .Map(pair => pair.Token)
-            .MatchAction(token => Ok(new { token }), Unauthorized);
+        return auth.Identify(login.Login, login.Password)
+            .Bind(user => auth.Authenticate(user))
+            .MatchAction(
+                token =>
+                    Ok(new { accessToken = token.AccessToken, refreshToken = token.RefreshToken }),
+                Unauthorized
+            );
     }
 
     [Authorize]

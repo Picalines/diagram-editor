@@ -5,7 +5,9 @@ namespace DiagramEditor.Services.Authentication;
 
 public interface IAuthenticator
 {
-    public Maybe<(User User, string Token)> Authenticate(string login, string passwordText);
+    public Maybe<User> Identify(string login, string passwordText);
+
+    public Maybe<(string AccessToken, string RefreshToken)> Authenticate(User user);
 
     public Maybe<User> GetCurrentUser();
 }

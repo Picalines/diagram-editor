@@ -30,18 +30,18 @@ public static class AuthConfiguration
         void ConfigureJwtBearer(JwtBearerOptions options)
         {
             var signinKey = new SymmetricSecurityKey(
-                Encoding.UTF8.GetBytes(jwtConfiguration.SignInSecret)
+                Encoding.UTF8.GetBytes(jwtConfiguration.AccessToken.Secret)
             );
 
             options.TokenValidationParameters = new TokenValidationParameters
             {
                 ValidateIssuerSigningKey = true,
-                IssuerSigningKey = signinKey,
                 ValidateIssuer = true,
-                ValidIssuer = jwtConfiguration.Issuer,
                 ValidateAudience = true,
-                ValidAudience = jwtConfiguration.Audience,
                 ValidateLifetime = true,
+                IssuerSigningKey = signinKey,
+                ValidIssuer = jwtConfiguration.Issuer,
+                ValidAudience = jwtConfiguration.Audience,
                 ClockSkew = TimeSpan.Zero,
             };
         }
