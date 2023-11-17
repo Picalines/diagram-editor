@@ -8,26 +8,28 @@ using DiagramEditor.Database.Models;
 using DiagramEditor.Extensions;
 using DiagramEditor.Repositories;
 using DiagramEditor.Services.Passwords;
+using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.IdentityModel.Tokens;
 
 namespace DiagramEditor.Services.Authentication;
 
 [Injectable(ServiceLifetime.Singleton)]
 public sealed class JwtAuthenticator(
-    IHttpContextAccessor httpContextAccessor,
     JwtConfiguration jwtConfiguration,
     IUserRepository users,
-    IPasswordHasher passwordHasher
+    IPasswordHasher passwordHasher,
+    IDistributedCache cache,
+    IHttpContextAccessor httpContextAccessor
 ) : IAuthenticator
 {
-    public Maybe<User> Identify(string login, string passwordText)
+    public Maybe<User> IdentifyUser(string login, string passwordText)
     {
         return users
             .GetByLogin(login)
             .Where(user => passwordHasher.Verify(passwordText, user.PasswordHash));
     }
 
-    public Maybe<(string AccessToken, string RefreshToken)> Authenticate(User user)
+    public (string AccessToken, string RefreshToken) Authenticate(User user)
     {
         var accessToken = GenerateToken(
             jwtConfiguration.AccessToken,
@@ -36,7 +38,28 @@ public sealed class JwtAuthenticator(
 
         var refreshToken = GenerateToken(jwtConfiguration.RefreshToken);
 
+        var refreshExpirationDate = DateTime
+            .UtcNow
+            .AddMinutes(jwtConfiguration.RefreshToken.ExpirationMinutes);
+
+        cache.SetString(
+            user.Id.ToString(),
+            refreshToken,
+            new() { AbsoluteExpiration = refreshExpirationDate }
+        );
+
         return (accessToken, refreshToken);
+    }
+
+    public bool ValidateRefresh(User user, string refreshToken)
+    {
+        return cache.GetString(user.Id.ToString()) == refreshToken
+            && ValidateRefreshToken(refreshToken);
+    }
+
+    public void Deauthenticate(User user)
+    {
+        cache.Remove(user.Id.ToString());
     }
 
     public Maybe<User> GetCurrentUser()
@@ -67,5 +90,37 @@ public sealed class JwtAuthenticator(
                 )
             )
         );
+    }
+
+    private bool ValidateRefreshToken(string refreshToken)
+    {
+        var tokenHandler = new JwtSecurityTokenHandler();
+
+        var signinKey = new SymmetricSecurityKey(
+            Encoding.UTF8.GetBytes(jwtConfiguration.RefreshToken.Secret)
+        );
+
+        var validationParameters = new TokenValidationParameters
+        {
+            ValidateIssuerSigningKey = true,
+            ValidateIssuer = true,
+            ValidateAudience = true,
+            ValidateLifetime = true,
+            IssuerSigningKey = signinKey,
+            ValidIssuer = jwtConfiguration.Issuer,
+            ValidAudience = jwtConfiguration.Audience,
+            ClockSkew = TimeSpan.Zero,
+        };
+
+        try
+        {
+            tokenHandler.ValidateToken(refreshToken, validationParameters, out _);
+        }
+        catch (SecurityTokenMalformedException)
+        {
+            return false;
+        }
+
+        return true;
     }
 }

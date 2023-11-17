@@ -1,3 +1,4 @@
+using System.ComponentModel.DataAnnotations;
 using CSharpFunctionalExtensions;
 using DiagramEditor.Controllers.Requests;
 using DiagramEditor.Extensions;
@@ -16,7 +17,7 @@ public sealed class UserController(IUserRepository users, IAuthenticator auth) :
     [HttpGet]
     public IActionResult GetCurrent()
     {
-        return auth.GetCurrentUser().MatchAction(Ok, Unauthorized);
+        return auth.GetCurrentUser().MatchAction(Ok, BadRequest);
     }
 
     [Authorize]
@@ -28,7 +29,7 @@ public sealed class UserController(IUserRepository users, IAuthenticator auth) :
 
     [AllowAnonymous]
     [HttpPost("register")]
-    public IActionResult Register([FromBody] RegisterRequest register)
+    public IActionResult Register([FromBody, Required] RegisterRequest register)
     {
         if (ModelState is { IsValid: false })
         {
@@ -37,25 +38,44 @@ public sealed class UserController(IUserRepository users, IAuthenticator auth) :
 
         return users
             .Create(register.Login, register.Password)
-            .MatchAction(Ok, creationError => BadRequest(new { reason = creationError }));
+            .Map(auth.Authenticate)
+            .Map(tokens => new { tokens.AccessToken, tokens.RefreshToken })
+            .MapError(error => new { error })
+            .MatchAction(Ok, BadRequest);
     }
 
     [AllowAnonymous]
     [HttpPost("login")]
-    public IActionResult Login([FromBody] LoginRequest login)
+    public IActionResult Login([FromBody, Required] LoginRequest login)
     {
         if (ModelState is { IsValid: false })
         {
             return BadRequest(ModelState);
         }
 
-        return auth.Identify(login.Login, login.Password)
-            .Bind(user => auth.Authenticate(user))
-            .MatchAction(
-                token =>
-                    Ok(new { accessToken = token.AccessToken, refreshToken = token.RefreshToken }),
-                Unauthorized
-            );
+        return auth.IdentifyUser(login.Login, login.Password)
+            .Map(auth.Authenticate)
+            .Map(tokens => new { tokens.AccessToken, tokens.RefreshToken })
+            .MatchAction(Ok, Unauthorized);
+    }
+
+    [Authorize]
+    [HttpPost("refresh")]
+    public IActionResult Refresh([FromBody, Required] RefreshRequest refresh)
+    {
+        if (ModelState is { IsValid: false })
+        {
+            return BadRequest(ModelState);
+        }
+
+        if (auth.GetCurrentUser().TryGetValue(out var user) is false)
+        {
+            return BadRequest();
+        }
+
+        return auth.Reauthenticate(user, refresh.RefreshToken)
+            .Map(tokens => new { tokens.AccessToken, tokens.RefreshToken })
+            .MatchAction(Ok, Forbid);
     }
 
     [Authorize]
