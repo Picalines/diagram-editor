@@ -1,11 +1,12 @@
 using DiagramEditor.Configuration;
-using DiagramEditor.Database;
 using DiagramEditor.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Configuration.AddJsonFile("secrets.json");
+builder.Configuration.AddJsonFile("appsettings.Secret.json");
+builder.Configuration.AddEnvironmentVariables();
 
+builder.Services.AddHttpContextAccessor();
 builder.Services.Scan(selector => selector.FromCallingAssembly().InjectableAttributes());
 
 builder.Services.AddControllers();
@@ -22,7 +23,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-/* app.UseHttpsRedirection(); */
+app.UseHttpsRedirection();
 app.UseAuthentication();
 app.UseAuthorization();
 
@@ -34,8 +35,5 @@ app.UseCors(options =>
 });
 
 app.MapControllers();
-
-var database = app.Services.GetRequiredService<ApplicationContext>().Database;
-database.EnsureCreated();
 
 app.Run();

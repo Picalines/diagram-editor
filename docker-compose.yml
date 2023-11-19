@@ -1,0 +1,39 @@
+version: '3.8'
+
+services:
+  api:
+    build:
+      context: api
+      dockerfile: Dockerfile
+    volumes:
+      - api-swagger:/app/web/src/api
+    env_file: .env
+    depends_on:
+      - mysql
+      - redis
+
+  web:
+    build:
+      context: web
+      dockerfile: Dockerfile
+    volumes:
+      - api-swagger:/app/web/src/api
+    ports:
+      - '8080:5173'
+    env_file: .env
+    depends_on:
+      - api
+
+  mysql:
+    image: mysql:8.2.0
+    environment:
+      - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
+      - MYSQL_DATABSE=${MYSQL_DATABASE}
+
+  redis:
+    image: redis:7.2.3-alpine
+    command: redis-server --port ${REDIS_PORT} --requirepass ${REDIS_PASSWORD}
+
+volumes:
+  api-swagger:
+

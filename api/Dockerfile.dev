@@ -1,0 +1,13 @@
+FROM mcr.microsoft.com/dotnet/sdk:8.0-alpine
+WORKDIR /app/api
+
+RUN mkdir -p /app/web/src/api
+
+COPY api.csproj .
+RUN dotnet restore
+
+COPY . .
+ENV DOTNET_ROLL_FORWARD=LatestMajor
+RUN dotnet tool restore && dotnet build
+
+ENTRYPOINT ["dotnet", "run"]

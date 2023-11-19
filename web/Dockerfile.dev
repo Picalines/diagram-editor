@@ -1,0 +1,10 @@
+FROM node:18-alpine
+WORKDIR /app/web
+
+COPY package.json package-lock.json .npmrc ./
+RUN npm install
+
+COPY . .
+RUN npm run codegen
+
+ENTRYPOINT ["npm", "run", "dev"]

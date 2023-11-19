@@ -1,0 +1,15 @@
+version: '3.8'
+
+services:
+  api:
+    build:
+      context: api
+      dockerfile: Dockerfile.dev
+    ports:
+      - '8099:8099'
+
+  web:
+    build:
+      context: web
+      dockerfile: Dockerfile.dev
+

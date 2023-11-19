@@ -1,7 +1,5 @@
-.config/
-
 bin/
 obj/
 
-secrets.json
+appsettings.Secret.json
 
