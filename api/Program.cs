@@ -3,6 +3,7 @@ using DiagramEditor.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
 
+
 builder.Configuration.AddJsonFile("appsettings.Secret.json");
 builder.Configuration.AddEnvironmentVariables();
 

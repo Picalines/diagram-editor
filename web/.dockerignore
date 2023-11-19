@@ -1,4 +1,6 @@
 **/node_modules
 
+**/src/api
+
 **/.svelte-kit
 !.svelte-kit/tsconfig.json

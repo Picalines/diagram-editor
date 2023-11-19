@@ -3,13 +3,13 @@ version: '3.8'
 services:
   api:
     build:
-      context: api
       dockerfile: Dockerfile.dev
     ports:
       - '8099:8099'
+    command: dotnet run
 
   web:
     build:
-      context: web
       dockerfile: Dockerfile.dev
+    command: npm run dev
 

@@ -82,6 +82,17 @@ public sealed class UserController(IUserRepository users, IAuthenticator auth) :
     [HttpPost("logout")]
     public IActionResult Logout()
     {
-        throw new NotImplementedException();
+        if (ModelState is { IsValid: false })
+        {
+            return BadRequest(ModelState);
+        }
+
+        if (auth.GetCurrentUser().TryGetValue(out var user) is false)
+        {
+            return BadRequest();
+        }
+
+        auth.Deauthenticate(user);
+        return Ok();
     }
 }

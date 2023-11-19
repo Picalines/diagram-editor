@@ -3,10 +3,9 @@ version: '3.8'
 services:
   api:
     build:
-      context: api
+      context: .
       dockerfile: Dockerfile
-    volumes:
-      - api-swagger:/app/web/src/api
+      target: api-build
     env_file: .env
     depends_on:
       - mysql
@@ -14,10 +13,9 @@ services:
 
   web:
     build:
-      context: web
+      context: .
       dockerfile: Dockerfile
-    volumes:
-      - api-swagger:/app/web/src/api
+      target: web-build
     ports:
       - '8080:5173'
     env_file: .env
@@ -33,7 +31,4 @@ services:
   redis:
     image: redis:7.2.3-alpine
     command: redis-server --port ${REDIS_PORT} --requirepass ${REDIS_PASSWORD}
-
-volumes:
-  api-swagger:
 

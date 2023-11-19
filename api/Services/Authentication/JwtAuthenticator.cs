@@ -7,8 +7,8 @@ using DiagramEditor.Configuration;
 using DiagramEditor.Database.Models;
 using DiagramEditor.Extensions;
 using DiagramEditor.Repositories;
+using DiagramEditor.Services.Cache;
 using DiagramEditor.Services.Passwords;
-using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.IdentityModel.Tokens;
 
 namespace DiagramEditor.Services.Authentication;
@@ -18,7 +18,7 @@ public sealed class JwtAuthenticator(
     JwtConfiguration jwtConfiguration,
     IUserRepository users,
     IPasswordHasher passwordHasher,
-    IDistributedCache cache,
+    IRefreshTokenCache refreshTokenCache,
     IHttpContextAccessor httpContextAccessor
 ) : IAuthenticator
 {
@@ -42,24 +42,20 @@ public sealed class JwtAuthenticator(
             .UtcNow
             .AddMinutes(jwtConfiguration.RefreshToken.ExpirationMinutes);
 
-        cache.SetString(
-            user.Id.ToString(),
-            refreshToken,
-            new() { AbsoluteExpiration = refreshExpirationDate }
-        );
+        refreshTokenCache.SetToken(user, refreshToken, refreshExpirationDate);
 
         return (accessToken, refreshToken);
     }
 
     public bool ValidateRefresh(User user, string refreshToken)
     {
-        return cache.GetString(user.Id.ToString()) == refreshToken
+        return refreshTokenCache.GetToken(user).Where(refreshToken.Equals).HasValue
             && ValidateRefreshToken(refreshToken);
     }
 
     public void Deauthenticate(User user)
     {
-        cache.Remove(user.Id.ToString());
+        refreshTokenCache.DeleteToken(user);
     }
 
     public Maybe<User> GetCurrentUser()
