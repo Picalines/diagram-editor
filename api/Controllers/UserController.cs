@@ -1,6 +1,7 @@
 using System.ComponentModel.DataAnnotations;
 using CSharpFunctionalExtensions;
 using DiagramEditor.Controllers.Requests;
+using DiagramEditor.Database.Models;
 using DiagramEditor.Extensions;
 using DiagramEditor.Repositories;
 using DiagramEditor.Services.Authentication;
@@ -9,90 +10,103 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace DiagramEditor.Controllers;
 
+using DiagramEditor.Controllers.Responses;
+using Microsoft.AspNetCore.Http.HttpResults;
+
 [ApiController]
-[Route("[controller]")]
+[Route("user")]
 public sealed class UserController(IUserRepository users, IAuthenticator auth) : ControllerBase
 {
     [Authorize]
     [HttpGet]
-    public IActionResult GetCurrent()
+    public Results<Ok<User>, BadRequest> GetCurrent()
     {
-        return auth.GetCurrentUser().MatchAction(Ok, BadRequest);
+        return auth.GetCurrentUser().ToTypedResult(TypedResults.Ok, TypedResults.BadRequest);
     }
 
     [Authorize]
     [HttpPut]
-    public IActionResult UpdateCurrent()
+    public IActionResult PutCurrent()
     {
         throw new NotImplementedException();
     }
 
     [AllowAnonymous]
     [HttpPost("register")]
-    public IActionResult Register([FromBody, Required] RegisterRequest register)
+    public Results<Ok<AuthTokensResponse>, BadRequest<string>> Register(
+        [FromBody, Required] RegisterRequest register
+    )
     {
         if (ModelState is { IsValid: false })
         {
-            return BadRequest(ModelState);
+            return TypedResults.BadRequest("invalid body");
         }
 
         return users
             .Create(register.Login, register.Password)
             .Map(auth.Authenticate)
-            .Map(tokens => new { tokens.AccessToken, tokens.RefreshToken })
-            .MapError(error => new { error })
-            .MatchAction(Ok, BadRequest);
+            .Map(AuthTokensResponse.FromTuple)
+            .MapError(error => error.ToString())
+            .ToTypedResult(TypedResults.Ok, TypedResults.BadRequest);
     }
 
     [AllowAnonymous]
     [HttpPost("login")]
-    public IActionResult Login([FromBody, Required] LoginRequest login)
+    public Results<Ok<AuthTokensResponse>, BadRequest, UnauthorizedHttpResult> Login(
+        [FromBody, Required] LoginRequest login
+    )
     {
         if (ModelState is { IsValid: false })
         {
-            return BadRequest(ModelState);
+            return TypedResults.BadRequest();
         }
 
-        return auth.IdentifyUser(login.Login, login.Password)
+        var tokens = auth.IdentifyUser(login.Login, login.Password)
             .Map(auth.Authenticate)
-            .Map(tokens => new { tokens.AccessToken, tokens.RefreshToken })
-            .MatchAction(Ok, Unauthorized);
+            .Map(AuthTokensResponse.FromTuple)
+            .GetValueOrDefault();
+
+        return tokens is { } ? TypedResults.Ok(tokens) : TypedResults.Unauthorized();
     }
 
     [Authorize]
     [HttpPost("refresh")]
-    public IActionResult Refresh([FromBody, Required] RefreshRequest refresh)
+    public Results<Ok<AuthTokensResponse>, BadRequest, ForbidHttpResult> Refresh(
+        [FromBody, Required] RefreshRequest refresh
+    )
     {
         if (ModelState is { IsValid: false })
         {
-            return BadRequest(ModelState);
+            return TypedResults.BadRequest();
         }
 
         if (auth.GetCurrentUser().TryGetValue(out var user) is false)
         {
-            return BadRequest();
+            return TypedResults.BadRequest();
         }
 
-        return auth.Reauthenticate(user, refresh.RefreshToken)
-            .Map(tokens => new { tokens.AccessToken, tokens.RefreshToken })
-            .MatchAction(Ok, Forbid);
+        var tokens = auth.Reauthenticate(user, refresh.RefreshToken)
+            .Map(AuthTokensResponse.FromTuple)
+            .GetValueOrDefault();
+
+        return tokens is { } ? TypedResults.Ok(tokens) : TypedResults.Forbid();
     }
 
     [Authorize]
     [HttpPost("logout")]
-    public IActionResult Logout()
+    public Results<Ok, BadRequest> Logout()
     {
         if (ModelState is { IsValid: false })
         {
-            return BadRequest(ModelState);
+            return TypedResults.BadRequest();
         }
 
         if (auth.GetCurrentUser().TryGetValue(out var user) is false)
         {
-            return BadRequest();
+            return TypedResults.BadRequest();
         }
 
         auth.Deauthenticate(user);
-        return Ok();
+        return TypedResults.Ok();
     }
 }

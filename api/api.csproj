@@ -21,6 +21,7 @@
     <PackageReference Include="Scrutor" Version="4.2.2" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.5.0" />
     <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="7.0.3" />
+    <PackageReference Include="Vernou.Swashbuckle.HttpResultsAdapter" Version="1.0.2" />
   </ItemGroup>
   <Target Name="OpenAPI" AfterTargets="Build" Condition="$(Configuration)=='Debug'">
     <Exec Command="dotnet swagger tofile --output ./swagger.json $(OutputPath)$(AssemblyName).dll v1" WorkingDirectory="$(ProjectDir)" />

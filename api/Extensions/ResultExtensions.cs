@@ -1,25 +1,31 @@
 using CSharpFunctionalExtensions;
-using Microsoft.AspNetCore.Mvc;
 
 namespace DiagramEditor.Extensions;
 
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http.HttpResults;
+
 public static class ResultExtensions
 {
-    public static IActionResult MatchAction<T>(
+    public static Results<RS, RE> ToTypedResult<T, RS, RE>(
         this Result<T> result,
-        Func<T, IActionResult> successAction,
-        Func<string, IActionResult> failureAction
+        Func<T, RS> successResult,
+        Func<string, RE> errorResult
     )
+        where RS : IResult
+        where RE : IResult
     {
-        return result.Match(successAction, failureAction);
+        return result.IsSuccess ? successResult(result.Value) : errorResult(result.Error);
     }
 
-    public static IActionResult MatchAction<T, E>(
+    public static Results<RS, RE> ToTypedResult<T, E, RS, RE>(
         this Result<T, E> result,
-        Func<T, IActionResult> successAction,
-        Func<E, IActionResult> failureAction
+        Func<T, RS> successResult,
+        Func<E, RE> errorResult
     )
+        where RS : IResult
+        where RE : IResult
     {
-        return result.Match(successAction, failureAction);
+        return result.IsSuccess ? successResult(result.Value) : errorResult(result.Error);
     }
 }
