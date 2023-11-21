@@ -1,21 +1,38 @@
 <script lang="ts">
-	import { userController } from '$api';
+	import { apiClient } from '$api';
+	import { authTokens, currentUserId, isAuthenticated } from '$lib/stores';
+	import { Maybe } from 'purify-ts';
 
 	let loginInput = '';
 	let passwordInput = '';
 
-	async function onSubmit(event: SubmitEvent) {
-		event.preventDefault();
-
-		const keys = await userController.postLoginUser({
-			body: { login: loginInput, password: passwordInput },
-		});
-
-		console.log(keys);
+	async function onSubmit() {
+		authTokens.set(
+			Maybe.of(
+				await apiClient.user.postLoginUser({
+					requestBody: { login: loginInput, password: passwordInput },
+				}),
+			),
+		);
 	}
 </script>
 
-<form on:submit={onSubmit}>
-	<input bind:value={loginInput} />
-	<input bind:value={passwordInput} />
+<form on:submit|preventDefault={onSubmit}>
+	<div>
+		<label for="login">Login</label>
+		<input name="login" bind:value={loginInput} />
+	</div>
+	<div>
+		<label for="password">Password</label>
+		<input name="password" type="password" bind:value={passwordInput} />
+	</div>
+	<button type="submit">Login</button>
 </form>
+
+<div>
+	{#if $isAuthenticated}
+		Authenticated as #{$currentUserId}
+	{:else}
+		Not authenticated
+	{/if}
+</div>

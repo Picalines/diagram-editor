@@ -2,7 +2,7 @@ using CSharpFunctionalExtensions;
 using DiagramEditor.Database.Models;
 using Microsoft.Extensions.Caching.Distributed;
 
-namespace DiagramEditor.Services.Cache;
+namespace DiagramEditor.Repositories.Cache;
 
 public class TokenCache(IDistributedCache cache, string tokenPrefix) : ITokenCache
 {

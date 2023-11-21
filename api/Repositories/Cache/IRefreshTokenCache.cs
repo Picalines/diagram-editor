@@ -1,3 +1,3 @@
-namespace DiagramEditor.Services.Cache;
+namespace DiagramEditor.Repositories.Cache;
 
 public interface IRefreshTokenCache : ITokenCache { }

@@ -15,7 +15,9 @@ public interface IAuthenticator
 
     public void Deauthenticate(User user);
 
-    public Maybe<User> GetCurrentUser();
+    public Maybe<User> GetAuthenticatedUser();
+
+    public Maybe<User> GetUserByAccessToken(string expiredAccessToken);
 
     public Maybe<AuthTokens> Reauthenticate(User user, string refreshToken)
     {

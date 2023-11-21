@@ -1,8 +1,7 @@
-
 using CSharpFunctionalExtensions;
 using DiagramEditor.Database.Models;
 
-namespace DiagramEditor.Services.Cache;
+namespace DiagramEditor.Repositories.Cache;
 
 public interface ITokenCache
 {

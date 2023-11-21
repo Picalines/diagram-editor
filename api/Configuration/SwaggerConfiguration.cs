@@ -114,7 +114,6 @@ file sealed class SwaggerRequestBodyMediaFilter : IOperationFilter
 {
     public void Apply(OpenApiOperation operation, OperationFilterContext context)
     {
-        Console.WriteLine(string.Join(", ", operation.RequestBody?.Content.Keys ?? new[] {""}));
         operation.RequestBody?.Content.Remove("application/*+json");
     }
 }

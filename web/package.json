@@ -6,7 +6,9 @@
 		"dev": "vite dev",
 		"build": "vite build",
 		"codegen": "npm run codegen:api",
-		"codegen:api": "node scripts/generate-api.js",
+		"codegen:api": "npm run codegen:api:cleanup && npm run codegen:api:generate",
+		"codegen:api:cleanup": "rm -rf src/api/codegen",
+		"codegen:api:generate": "openapi --input src/api/swagger.json --output src/api/codegen --client axios --name GeneratedApiClient --useOptions --useUnionTypes",
 		"preview": "vite preview",
 		"check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
 		"check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",
@@ -14,7 +16,6 @@
 		"format": "prettier --plugin-search-dir . --write ."
 	},
 	"devDependencies": {
-		"@devexperts/swagger-codegen-ts": "^2.0.0-alpha.29",
 		"@fontsource/fira-mono": "^4.5.10",
 		"@neoconfetti/svelte": "^1.0.0",
 		"@sveltejs/adapter-auto": "^2.0.0",
@@ -25,7 +26,10 @@
 		"@typescript-eslint/parser": "^6.0.0",
 		"eslint": "^8.28.0",
 		"eslint-config-prettier": "^8.5.0",
+		"eslint-plugin-index": "^1.1.7",
 		"eslint-plugin-svelte": "^2.30.0",
+		"form-data": "^4.0.0",
+		"openapi-typescript-codegen": "^0.25.0",
 		"prettier": "^3.0.3",
 		"prettier-plugin-svelte": "^3.0.3",
 		"svelte": "^4.0.5",
@@ -35,8 +39,7 @@
 		"vite": "^4.4.2"
 	},
 	"dependencies": {
-		"fp-ts": "^2.16.1",
-		"io-ts": "^2.2.20",
-		"io-ts-types": "^0.5.19"
+		"axios": "^1.6.2",
+		"purify-ts": "^2.0.1"
 	}
 }

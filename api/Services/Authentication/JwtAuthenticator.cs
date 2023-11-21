@@ -7,7 +7,7 @@ using DiagramEditor.Configuration;
 using DiagramEditor.Database.Models;
 using DiagramEditor.Extensions;
 using DiagramEditor.Repositories;
-using DiagramEditor.Services.Cache;
+using DiagramEditor.Repositories.Cache;
 using DiagramEditor.Services.Passwords;
 using Microsoft.IdentityModel.Tokens;
 
@@ -58,13 +58,55 @@ public sealed class JwtAuthenticator(
         refreshTokenCache.DeleteToken(user);
     }
 
-    public Maybe<User> GetCurrentUser()
+    public Maybe<User> GetAuthenticatedUser()
     {
         return httpContextAccessor
             .HttpContext
             .AsMaybe()
-            .Map(httpContext => httpContext.User.Claims)
-            .Bind(claims => claims.TryFirst(claim => claim.Type is "id"))
+            .Map(httpContext => httpContext.User)
+            .Bind(GetUserByPrincipal);
+    }
+
+    public Maybe<User> GetUserByAccessToken(string expiredAccessToken)
+    {
+        var signinKey = new SymmetricSecurityKey(
+            Encoding.UTF8.GetBytes(jwtConfiguration.AccessToken.Secret)
+        );
+
+        var validationParameters = new TokenValidationParameters
+        {
+            ValidateIssuerSigningKey = true,
+            ValidateAudience = true,
+            ValidateIssuer = true,
+            ValidateLifetime = false,
+            IssuerSigningKey = signinKey,
+            ValidIssuer = jwtConfiguration.Issuer,
+            ValidAudience = jwtConfiguration.Audience,
+        };
+
+        ClaimsPrincipal principal;
+
+        try
+        {
+            principal = new JwtSecurityTokenHandler().ValidateToken(
+                expiredAccessToken,
+                validationParameters,
+                out var securityToken
+            );
+        }
+        catch
+        {
+            return Maybe.None;
+        }
+
+        return GetUserByPrincipal(principal);
+    }
+
+    private Maybe<User> GetUserByPrincipal(ClaimsPrincipal claims)
+    {
+        return claims
+            .Claims
+            .TryFirst(claim => claim.Type is "id")
             .Bind(idClaim => idClaim.Value.MaybeParse<int>())
             .Bind(users.GetById);
     }
@@ -90,8 +132,6 @@ public sealed class JwtAuthenticator(
 
     private bool ValidateRefreshToken(string refreshToken)
     {
-        var tokenHandler = new JwtSecurityTokenHandler();
-
         var signinKey = new SymmetricSecurityKey(
             Encoding.UTF8.GetBytes(jwtConfiguration.RefreshToken.Secret)
         );
@@ -110,9 +150,9 @@ public sealed class JwtAuthenticator(
 
         try
         {
-            tokenHandler.ValidateToken(refreshToken, validationParameters, out _);
+            new JwtSecurityTokenHandler().ValidateToken(refreshToken, validationParameters, out _);
         }
-        catch (SecurityTokenMalformedException)
+        catch
         {
             return false;
         }

@@ -1,0 +1,23 @@
+version: '3.8'
+
+services:
+  api:
+    image: mcr.microsoft.com/dotnet/sdk:8.0-alpine
+    volumes:
+      - './api:/app/api'
+    working_dir: /app/api
+    command: sh -c "
+        dotnet tool restore
+        && dotnet watch
+      "
+
+  web:
+    image: node:18-alpine
+    volumes:
+      - './web:/app/web'
+    working_dir: /app/web
+    command: sh -c "
+        npm ci
+        && npm run dev
+      "
+

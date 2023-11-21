@@ -21,7 +21,7 @@ public sealed class UserController(IUserRepository users, IAuthenticator auth) :
     [HttpGet]
     public Results<Ok<User>, BadRequest> GetCurrent()
     {
-        return auth.GetCurrentUser().ToTypedResult(TypedResults.Ok, TypedResults.BadRequest);
+        return auth.GetAuthenticatedUser().ToTypedResult(TypedResults.Ok, TypedResults.BadRequest);
     }
 
     [Authorize]
@@ -69,7 +69,7 @@ public sealed class UserController(IUserRepository users, IAuthenticator auth) :
         return tokens is { } ? TypedResults.Ok(tokens) : TypedResults.Unauthorized();
     }
 
-    [Authorize]
+    [AllowAnonymous]
     [HttpPost("refresh")]
     public Results<Ok<AuthTokensResponse>, BadRequest, ForbidHttpResult> Refresh(
         [FromBody, Required] RefreshRequest refresh
@@ -80,7 +80,7 @@ public sealed class UserController(IUserRepository users, IAuthenticator auth) :
             return TypedResults.BadRequest();
         }
 
-        if (auth.GetCurrentUser().TryGetValue(out var user) is false)
+        if (auth.GetUserByAccessToken(refresh.AccessToken).TryGetValue(out var user) is false)
         {
             return TypedResults.BadRequest();
         }
@@ -101,7 +101,7 @@ public sealed class UserController(IUserRepository users, IAuthenticator auth) :
             return TypedResults.BadRequest();
         }
 
-        if (auth.GetCurrentUser().TryGetValue(out var user) is false)
+        if (auth.GetAuthenticatedUser().TryGetValue(out var user) is false)
         {
             return TypedResults.BadRequest();
         }

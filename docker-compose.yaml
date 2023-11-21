@@ -2,20 +2,16 @@ version: '3.8'
 
 services:
   api:
-    build:
-      context: .
-      dockerfile: Dockerfile
-      target: api-build
+    ports:
+      - '8099:8099'
     env_file: .env
+    environment:
+      - 'DOTNET_ROLL_FORWARD=LatestMajor'
     depends_on:
       - mysql
       - redis
 
   web:
-    build:
-      context: .
-      dockerfile: Dockerfile
-      target: web-build
     ports:
       - '8080:5173'
     env_file: .env
