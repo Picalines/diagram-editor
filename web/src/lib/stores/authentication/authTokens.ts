@@ -1,17 +1,17 @@
 import { assertIsBrowser } from '$lib/assert';
-import { Maybe } from 'purify-ts';
+import { Maybe } from '$lib/functional';
 import { writable } from 'svelte/store';
 
-type AuthTokens = {
+type AuthTokens = Readonly<{
 	accessToken: string;
 	refreshToken: string;
-};
+}>;
 
 const ACCESS_TOKEN_KEY = 'auth.access';
 const REFRESH_TOKEN_KEY = 'auth.refresh';
 
-const { set: _set, subscribe: subscribe } = writable<Maybe<AuthTokens>>(
-	Maybe.empty(),
+const { set: _set, subscribe } = writable<Maybe<AuthTokens>>(
+	Maybe.none(),
 	setInitial => {
 		assertIsBrowser();
 
@@ -19,16 +19,16 @@ const { set: _set, subscribe: subscribe } = writable<Maybe<AuthTokens>>(
 		const refreshToken = localStorage.getItem(REFRESH_TOKEN_KEY);
 
 		if (!(accessToken && refreshToken)) {
-			setInitial(Maybe.empty());
+			setInitial(Maybe.none());
 			return;
 		}
 
 		try {
-			setInitial(Maybe.of({ accessToken: atob(accessToken), refreshToken: atob(refreshToken) }));
+			setInitial(Maybe.some({ accessToken: atob(accessToken), refreshToken: atob(refreshToken) }));
 		} catch {
 			localStorage.removeItem(ACCESS_TOKEN_KEY);
 			localStorage.removeItem(REFRESH_TOKEN_KEY);
-			setInitial(Maybe.empty());
+			setInitial(Maybe.none());
 		}
 	},
 );
@@ -39,7 +39,7 @@ const set = (tokens: Maybe<AuthTokens>) => {
 	localStorage.removeItem(ACCESS_TOKEN_KEY);
 	localStorage.removeItem(REFRESH_TOKEN_KEY);
 
-	tokens.ifJust(({ accessToken, refreshToken }) => {
+	tokens.ifSome(({ accessToken, refreshToken }) => {
 		localStorage.setItem(ACCESS_TOKEN_KEY, btoa(accessToken));
 		localStorage.setItem(REFRESH_TOKEN_KEY, btoa(refreshToken));
 	});

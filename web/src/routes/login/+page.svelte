@@ -1,14 +1,14 @@
 <script lang="ts">
 	import { apiClient } from '$api';
+	import { Maybe } from '$lib/functional';
 	import { authTokens, currentUserId, isAuthenticated } from '$lib/stores';
-	import { Maybe } from 'purify-ts';
 
 	let loginInput = '';
 	let passwordInput = '';
 
 	async function onSubmit() {
 		authTokens.set(
-			Maybe.of(
+			Maybe.some(
 				await apiClient.user.postLoginUser({
 					requestBody: { login: loginInput, password: passwordInput },
 				}),

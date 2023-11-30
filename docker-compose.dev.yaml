@@ -5,19 +5,22 @@ services:
     image: mcr.microsoft.com/dotnet/sdk:8.0-alpine
     volumes:
       - './api:/app/api'
-    working_dir: /app/api
-    command: sh -c "
-        dotnet tool restore
-        && dotnet watch
-      "
+      - '/app/api/bin'
+      - '/app/api/obj'
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+      target: api-build
+    command: dotnet watch
 
   web:
     image: node:18-alpine
     volumes:
       - './web:/app/web'
-    working_dir: /app/web
-    command: sh -c "
-        npm ci
-        && npm run dev
-      "
+      - '/app/web/node_modules'
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+      target: web-build
+    command: npm run dev
 
