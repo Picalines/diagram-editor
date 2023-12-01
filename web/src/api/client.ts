@@ -4,14 +4,14 @@ import { get } from 'svelte/store';
 import { AxiosHttpRequest } from './AxiosHttpRequest';
 import { GeneratedApiClient } from './codegen';
 import axios, { AxiosError } from 'axios';
-import { Maybe } from 'purify-ts';
+import { Maybe } from '$lib/functional';
 
 assertIsBrowser();
 
 const axiosInstance = axios.create();
 
 axiosInstance.interceptors.request.use(request => {
-	get(authTokens).ifJust(({ accessToken }) => {
+	get(authTokens).ifSome(({ accessToken }) => {
 		request.headers['Authorization'] = `Bearer ${accessToken}`;
 	});
 
@@ -39,11 +39,11 @@ export function useRefreshInterceptor() {
 					apiClient.user
 						.postRefreshUser({ requestBody: { accessToken, refreshToken } })
 						.then(newTokens => {
-							authTokens.set(Maybe.of(newTokens));
+							authTokens.set(Maybe.some(newTokens));
 							return axiosInstance(response.config);
 						})
 						.catch(refreshError => {
-							authTokens.set(Maybe.empty());
+							authTokens.set(Maybe.none());
 							return Promise.reject(refreshError);
 						})
 						.finally(useRefreshInterceptor),

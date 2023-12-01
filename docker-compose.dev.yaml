@@ -7,20 +7,14 @@ services:
       - './api:/app/api'
       - '/app/api/bin'
       - '/app/api/obj'
-    build:
-      context: .
-      dockerfile: Dockerfile.dev
-      target: api-build
-    command: dotnet watch
+    working_dir: '/app/api'
+    command: sh -c "dotnet restore && dotnet tool restore && dotnet watch"
 
   web:
     image: node:18-alpine
     volumes:
       - './web:/app/web'
       - '/app/web/node_modules'
-    build:
-      context: .
-      dockerfile: Dockerfile.dev
-      target: web-build
-    command: npm run dev
+    working_dir: '/app/web'
+    command: sh -c "npm ci && npm run dev"
 

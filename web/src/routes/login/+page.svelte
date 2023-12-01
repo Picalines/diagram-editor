@@ -1,7 +1,8 @@
 <script lang="ts">
 	import { apiClient } from '$api';
+	import { goto } from '$app/navigation';
 	import { Maybe } from '$lib/functional';
-	import { authTokens, currentUserId, isAuthenticated } from '$lib/stores';
+	import { authTokens, isAuthenticated } from '$lib/stores';
 
 	let loginInput = '';
 	let passwordInput = '';
@@ -14,6 +15,10 @@
 				}),
 			),
 		);
+	}
+
+	$: if ($isAuthenticated) {
+		goto('/profile');
 	}
 </script>
 
@@ -28,11 +33,3 @@
 	</div>
 	<button type="submit">Login</button>
 </form>
-
-<div>
-	{#if $isAuthenticated}
-		Authenticated as #{$currentUserId}
-	{:else}
-		Not authenticated
-	{/if}
-</div>
