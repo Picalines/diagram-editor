@@ -1,4 +1,4 @@
-namespace DiagramEditor.Attributes;
+namespace DiagramEditor.Common.Attributes;
 
 [AttributeUsage(AttributeTargets.Class, AllowMultiple = false)]
 public sealed class InjectableAttribute(ServiceLifetime lifetime) : Attribute

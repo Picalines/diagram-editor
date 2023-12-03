@@ -1,7 +1,7 @@
 using CSharpFunctionalExtensions;
 using Microsoft.AspNetCore.Mvc;
 
-namespace DiagramEditor.Extensions;
+namespace DiagramEditor.Common.Extensions;
 
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.HttpResults;

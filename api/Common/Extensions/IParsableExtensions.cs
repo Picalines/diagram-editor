@@ -1,6 +1,6 @@
 using CSharpFunctionalExtensions;
 
-namespace DiagramEditor.Extensions;
+namespace DiagramEditor.Common.Extensions;
 
 public static class IParsableExtensions
 {

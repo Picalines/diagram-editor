@@ -1,7 +1,7 @@
 using DiagramEditor.Attributes;
 using Scrutor;
 
-namespace DiagramEditor.Extensions;
+namespace DiagramEditor.Common.Extensions;
 
 public static class ScrutorExtensions
 {

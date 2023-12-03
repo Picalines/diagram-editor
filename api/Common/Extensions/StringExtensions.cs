@@ -1,4 +1,4 @@
-namespace DiagramEditor.Extensions;
+namespace DiagramEditor.Common.Extensions;
 
 public static class StringExtensions
 {
