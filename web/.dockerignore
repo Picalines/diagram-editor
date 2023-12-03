@@ -1,7 +1,0 @@
-**/node_modules
-
-**/src/api/codegen
-**/src/api/swagger.json
-
-**/.svelte-kit
-!.svelte-kit/tsconfig.json
