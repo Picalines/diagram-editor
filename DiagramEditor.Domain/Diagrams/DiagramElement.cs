@@ -1,10 +1,8 @@
 ﻿namespace DiagramEditor.Domain.Diagrams;
 
-public readonly record struct DiagramElementId(Guid Value);
-
 public sealed class DiagramElement
 {
-    public DiagramElementId Id { get; private set; }
+    public Guid Id { get; private set; }
 
     public required Diagram Diagram { get; init; }
 

@@ -14,7 +14,7 @@ internal sealed class UserRepository(
     IPasswordValidator passwordValidator
 ) : IUserRepository
 {
-    public Maybe<User> GetById(UserId userId)
+    public Maybe<User> GetById(Guid userId)
     {
         return context.Users.SingleOrDefault(user => user.Id == userId).AsMaybe();
     }
@@ -36,12 +36,7 @@ internal sealed class UserRepository(
             return UserCreationError.InvalidPassword;
         }
 
-        var user = new User
-        {
-            Login = login,
-            PasswordHash = passwordHasher.Hash(passwordText),
-            DisplayName = login,
-        };
+        var user = new User(login, passwordHasher.Hash(passwordText));
 
         context.Users.Add(user);
         context.SaveChanges();

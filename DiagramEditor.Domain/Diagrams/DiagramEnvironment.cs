@@ -2,11 +2,9 @@
 
 namespace DiagramEditor.Domain;
 
-public readonly record struct DiagramEnvironmentId(Guid Value);
-
 public sealed class DiagramEnvironment
 {
-    public DiagramEnvironmentId Id { get; private set; }
+    public Guid Id { get; private set; }
 
     public required Diagram Diagram { get; init; }
 

@@ -1,6 +1,0 @@
-@DiagramEditor.Web.API_HostAddress = http://localhost:5285
-
-GET {{DiagramEditor.Web.API_HostAddress}}/weatherforecast/
-Accept: application/json
-
-###

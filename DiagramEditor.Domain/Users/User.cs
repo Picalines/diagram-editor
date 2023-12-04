@@ -1,22 +1,22 @@
-﻿using CSharpFunctionalExtensions;
+﻿using System.Text.Json.Serialization;
 
 namespace DiagramEditor.Domain.Users;
 
-public readonly record struct UserId(Guid Value);
-
-public sealed class User
+public sealed class User(string login, string passwordHash)
 {
-    public UserId Id { get; private set; }
+    public Guid Id { get; private set; }
 
-    public required string Login { get; set; }
+    public string Login { get; set; } = login;
 
-    public required string PasswordHash { get; set; }
+    [JsonIgnore]
+    public string PasswordHash { get; set; } = passwordHash;
 
-    public required string DisplayName { get; set; }
+    public string DisplayName { get; set; } = login;
 
-    public Maybe<string> AvatarUrl { get; set; } = Maybe.None;
+    public string? AvatarUrl { get; set; } = null;
 
     public DateTime CreatedDate { get; set; } = DateTime.UtcNow;
 
+    [JsonIgnore]
     public bool IsAdmin { get; set; } = false;
 }

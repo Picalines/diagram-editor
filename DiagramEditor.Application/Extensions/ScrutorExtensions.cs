@@ -1,4 +1,5 @@
-﻿using DiagramEditor.Application.Attributes;
+﻿using System.Reflection;
+using DiagramEditor.Application.Attributes;
 using Microsoft.Extensions.DependencyInjection;
 using Scrutor;
 
@@ -27,6 +28,7 @@ public static class ScrutorExtensions
 
     public static IServiceCollection AddInjectableFromCallingAssembly(this IServiceCollection services)
     {
-        return services.Scan(selector => selector.FromCallingAssembly().InjectableAttributes());
+        var assembly = Assembly.GetCallingAssembly();
+        return services.Scan(selector => selector.FromAssemblies(assembly).InjectableAttributes());
     }
 }

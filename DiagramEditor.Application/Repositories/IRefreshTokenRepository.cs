@@ -5,9 +5,9 @@ namespace DiagramEditor.Application;
 
 public interface IRefreshTokenRepository
 {
-    public Maybe<string> GetToken(UserId userId);
+    public Maybe<string> GetToken(Guid userId);
 
-    public void SetToken(UserId userId, string token, DateTime expirationDate);
+    public void SetToken(Guid userId, string token, DateTime expirationDate);
 
-    public void DeleteToken(UserId userId);
+    public void DeleteToken(Guid userId);
 }

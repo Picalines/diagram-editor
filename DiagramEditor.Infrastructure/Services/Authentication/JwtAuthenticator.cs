@@ -109,7 +109,6 @@ internal sealed class JwtAuthenticator(
             .Claims
             .TryFirst(claim => claim.Type is "id")
             .Bind(idClaim => idClaim.Value.MaybeParse<Guid>())
-            .Map(guid => new UserId(guid))
             .Bind(users.GetById);
     }
 

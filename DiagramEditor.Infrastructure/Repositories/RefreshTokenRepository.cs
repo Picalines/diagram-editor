@@ -10,25 +10,25 @@ namespace DiagramEditor.Infrastructure.Repositories;
 [Injectable(ServiceLifetime.Singleton)]
 internal class RefreshTokenRepository(IDistributedCache cache) : IRefreshTokenRepository
 {
-    public Maybe<string> GetToken(UserId userId)
+    public Maybe<string> GetToken(Guid userId)
     {
-        return cache.GetString(UserIdToKey(userId)).AsMaybe();
+        return cache.GetString(GuidToKey(userId)).AsMaybe();
     }
 
-    public void SetToken(UserId userId, string token, DateTime expirationDate)
+    public void SetToken(Guid userId, string token, DateTime expirationDate)
     {
-        cache.SetString(UserIdToKey(userId), token, new()
+        cache.SetString(GuidToKey(userId), token, new()
         {
             AbsoluteExpiration = expirationDate,
         });
     }
 
-    public void DeleteToken(UserId userId)
+    public void DeleteToken(Guid userId)
     {
-        cache.Remove(UserIdToKey(userId));
+        cache.Remove(GuidToKey(userId));
     }
 
-    private static string UserIdToKey(UserId userId)
+    private static string GuidToKey(Guid userId)
     {
         return $"refresh.{userId}";
     }

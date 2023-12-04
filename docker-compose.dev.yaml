@@ -1,0 +1,30 @@
+version: '3.8'
+
+services:
+  web-api:
+    image: mcr.microsoft.com/dotnet/sdk:8.0-alpine
+    volumes:
+      - './DiagramEditor.Domain/:/api/DiagramEditor.Domain'
+      - './DiagramEditor.Application:/api/DiagramEditor.Application'
+      - './DiagramEditor.Infrastructure:/api/DiagramEditor.Infrastructure'
+      - './DiagramEditor.Web.API:/api/DiagramEditor.Web.API'
+      - './diagram-editor.sln:/api/diagram-editor.sln'
+      - '/api/DiagramEditor.Domain/bin'
+      - '/api/DiagramEditor.Domain/obj'
+      - '/api/DiagramEditor.Application/bin'
+      - '/api/DiagramEditor.Application/obj'
+      - '/api/DiagramEditor.Infrastructure/bin'
+      - '/api/DiagramEditor.Infrastructure/obj'
+      - '/api/DiagramEditor.Web.API/bin'
+      - '/api/DiagramEditor.Web.API/obj'
+      - './scripts:/api/scripts'
+    working_dir: '/api/DiagramEditor.Web.API'
+    command: sh -c "dotnet restore && dotnet tool restore && dotnet watch"
+
+#  web-ui:
+#    image: node:18-alpine
+#    volumes:
+#      - './web:/app/web'
+#      - '/app/web/node_modules'
+#    working_dir: '/app/web'
+#    command: sh -c "npm ci && npm run dev"

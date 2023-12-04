@@ -2,11 +2,9 @@
 
 namespace DiagramEditor.Domain.Diagrams;
 
-public readonly record struct DiagramId(Guid Value);
-
 public sealed class Diagram
 {
-    public DiagramId Id { get; private set; }
+    public Guid Id { get; private set; }
 
     public required User Creator { get; init; }
 

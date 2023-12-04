@@ -11,7 +11,7 @@ public enum UserCreationError
 
 public interface IUserRepository
 {
-    public Maybe<User> GetById(UserId id);
+    public Maybe<User> GetById(Guid id);
 
     public Maybe<User> GetByLogin(string login);
 

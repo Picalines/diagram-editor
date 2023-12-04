@@ -1,32 +1,41 @@
-﻿using DiagramEditor.Domain;
+﻿using DiagramEditor.Application.Attributes;
 using DiagramEditor.Domain.Diagrams;
 using DiagramEditor.Domain.Users;
 using DiagramEditor.Infrastructure.Configuration.Database;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace DiagramEditor.Infrastructure;
 
-internal sealed class ApplicationContext(MySqlConfigurationSection mySqlConfiguration) : DbContext
+[Injectable(ServiceLifetime.Transient)]
+public sealed class ApplicationContext : DbContext
 {
     public DbSet<User> Users { get; set; } = null!;
 
     public DbSet<Diagram> Diagrams { get; set; } = null!;
 
-    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    private static MySqlConfigurationSection _mySqlConfiguration = null!;
+
+    public ApplicationContext(MySqlConfigurationSection mySqlConfiguration)
     {
-        modelBuilder.ApplyConfigurationsFromAssembly(typeof(ApplicationContext).Assembly);
+        if (_mySqlConfiguration is null)
+        {
+            _mySqlConfiguration = mySqlConfiguration;
+
+            Database.EnsureCreated();
+        }
     }
 
     protected override void OnConfiguring(DbContextOptionsBuilder options)
     {
         var mySqlConnectionString = CreateConnectionString(
-            ("server", mySqlConfiguration.Server),
+            ("server", _mySqlConfiguration.Server),
             ("uid", "root"),
-            ("pwd", mySqlConfiguration.RootPassword),
-            ("database", mySqlConfiguration.Database)
+            ("pwd", _mySqlConfiguration.RootPassword),
+            ("database", _mySqlConfiguration.Database)
         );
 
-        var mySqlVersion = new MySqlServerVersion(mySqlConfiguration.Version);
+        var mySqlVersion = new MySqlServerVersion(_mySqlConfiguration.Version);
 
         options.UseMySql(mySqlConnectionString, mySqlVersion);
     }
