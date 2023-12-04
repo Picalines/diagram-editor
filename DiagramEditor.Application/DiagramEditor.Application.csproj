@@ -2,8 +2,11 @@
   <ItemGroup>
     <ProjectReference Include="..\DiagramEditor.Domain\DiagramEditor.Domain.csproj" />
   </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Services\Authentication\" />
+  </ItemGroup>
   <PropertyGroup>
-    <TargetFramework>net7.0</TargetFramework>
+    <TargetFramework>net8.0</TargetFramework>
     <RootNamespace>DiagramEditor.Application</RootNamespace>
     <LangVersion>12.0</LangVersion>
     <ImplicitUsings>enable</ImplicitUsings>
