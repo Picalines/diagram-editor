@@ -4,5 +4,5 @@ public interface IPasswordHasher
 {
     public string Hash(string passwordText);
 
-    public bool Verify(string passwordText, string PasswordHash);
+    public bool Verify(string passwordText, string passwordHash);
 }

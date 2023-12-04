@@ -1,3 +1,6 @@
+using DiagramEditor.Infrastructure;
+using DiagramEditor.Web.API.Configuration;
+
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Configuration.AddJsonFile("appsettings.Secret.json");
@@ -7,9 +10,9 @@ builder.Services.AddHttpContextAccessor();
 
 builder.Services.AddControllers();
 
-builder.Services.UseSwagger();
-builder.Services.UseDistributedCache(builder.Configuration);
-builder.Services.UseJwtAuthentication(builder.Configuration);
+builder.Services.AddInfrastructure(builder.Configuration);
+
+builder.Services.AddSwagger();
 
 builder.Services.AddCors(
     options => options.AddPolicy("AllowAll", builder => builder

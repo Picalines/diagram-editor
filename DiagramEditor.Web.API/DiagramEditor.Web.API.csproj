@@ -10,9 +10,10 @@
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="8.0.0" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.4.0" />
+    <PackageReference Include="Vernou.Swashbuckle.HttpResultsAdapter" Version="1.0.2" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\DiagramEditor.Application\DiagramEditor.Application.csproj" />
-    <ProjectReference Include="..\DomainEditor.Infrastructure\DiagramEditor.Infrastructure.csproj" />
+    <ProjectReference Include="..\DiagramEditor.Infrastructure\DiagramEditor.Infrastructure.csproj" />
   </ItemGroup>
 </Project>

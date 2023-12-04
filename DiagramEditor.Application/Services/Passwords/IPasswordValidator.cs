@@ -1,4 +1,4 @@
-﻿namespace DiagramEditor.Application;
+﻿namespace DiagramEditor.Application.Services.Passwords;
 
 public interface IPasswordValidator
 {

@@ -15,5 +15,5 @@ public interface IUserRepository
 
     public Maybe<User> GetByLogin(string login);
 
-    public Result<User, UserCreationError> Register(User user);
+    public Result<User, UserCreationError> Register(string login, string passwordText);
 }
