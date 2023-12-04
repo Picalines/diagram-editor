@@ -4,7 +4,7 @@ namespace DiagramEditor.Infrastructure.Configuration.Database;
 
 public sealed class MySqlConfigurationSection
 {
-    [ConfigurationKeyName("MySql:Server")]
+    [ConfigurationKeyName("MYSQL_SERVER")]
     public required string Server { get; set; }
 
     [ConfigurationKeyName("MySql:Version")]

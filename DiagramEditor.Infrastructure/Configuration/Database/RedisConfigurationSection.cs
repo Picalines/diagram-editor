@@ -4,7 +4,7 @@ namespace DiagramEditor.Infrastructure.Configuration.Database;
 
 public sealed class RedisConfigurationSection
 {
-    [ConfigurationKeyName("Redis:Host")]
+    [ConfigurationKeyName("REDIS_HOST")]
     public required string Host { get; set; }
 
     [ConfigurationKeyName("REDIS_PORT")]

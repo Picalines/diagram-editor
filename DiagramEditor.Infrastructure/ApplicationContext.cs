@@ -1,4 +1,5 @@
-﻿using DiagramEditor.Domain.Diagrams;
+﻿using DiagramEditor.Domain;
+using DiagramEditor.Domain.Diagrams;
 using DiagramEditor.Domain.Users;
 using DiagramEditor.Infrastructure.Configuration.Database;
 using Microsoft.EntityFrameworkCore;
@@ -10,6 +11,11 @@ internal sealed class ApplicationContext(MySqlConfigurationSection mySqlConfigur
     public DbSet<User> Users { get; set; } = null!;
 
     public DbSet<Diagram> Diagrams { get; set; } = null!;
+
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    {
+        modelBuilder.ApplyConfigurationsFromAssembly(typeof(ApplicationContext).Assembly);
+    }
 
     protected override void OnConfiguring(DbContextOptionsBuilder options)
     {
