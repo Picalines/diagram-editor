@@ -1,3 +1,4 @@
+using DiagramEditor.Application;
 using DiagramEditor.Infrastructure;
 using DiagramEditor.Web.API.Configuration;
 
@@ -10,7 +11,9 @@ builder.Services.AddHttpContextAccessor();
 
 builder.Services.AddControllers();
 
-builder.Services.AddInfrastructure(builder.Configuration);
+builder.Services
+    .AddApplication()
+    .AddInfrastructure(builder.Configuration);
 
 builder.Services.AddSwagger();
 

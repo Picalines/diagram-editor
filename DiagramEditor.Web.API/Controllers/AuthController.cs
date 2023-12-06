@@ -1,8 +1,9 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using CSharpFunctionalExtensions;
-using DiagramEditor.Application.Services.Authentication;
-using DiagramEditor.Domain;
-using DiagramEditor.Web.API.Controllers.Requests;
+using System.Transactions;
+using DiagramEditor.Application.UseCases;
+using DiagramEditor.Application.UseCases.Authentication.Login;
+using DiagramEditor.Application.UseCases.Authentication.Logout;
+using DiagramEditor.Application.UseCases.Authentication.Refresh;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
@@ -11,62 +12,70 @@ namespace DiagramEditor.Web.API.Controllers;
 
 [ApiController]
 [Route("auth")]
-public sealed class AuthController(IAuthenticator auth) : ControllerBase
+public sealed class AuthController(
+    ILoginUseCase loginUseCase,
+    IRefreshUseCase refreshUseCase,
+    ILogoutUseCase logoutUseCase
+) : ControllerBase
 {
     [AllowAnonymous]
     [HttpPost("login")]
-    public Results<Ok<AuthTokens>, BadRequest, UnauthorizedHttpResult> Login([FromBody, Required] LoginRequest login)
+    public async Task<Results<Ok<LoginResponse>, BadRequest, UnauthorizedHttpResult>> Login([FromBody, Required] LoginRequest request)
     {
         if (ModelState is { IsValid: false })
         {
             return TypedResults.BadRequest();
         }
 
-        var tokens = auth.IdentifyUser(login.Login, login.Password)
-            .Map(auth.Authenticate)
-            .GetValueOrDefault();
-
-        return tokens is { } ? TypedResults.Ok(tokens) : TypedResults.Unauthorized();
+        return await loginUseCase.Execute(request) switch
+        {
+            { IsSuccess: true, Value: var response } => TypedResults.Ok(response),
+            { Error.Error: var error } => error switch
+            {
+                LoginError.InvalidCredentials => TypedResults.Unauthorized(),
+                _ => throw new NotImplementedException(),
+            },
+        };
     }
 
     [AllowAnonymous]
     [HttpPost("refresh")]
-    public Results<Ok<AuthTokens>, BadRequest, ForbidHttpResult> Refresh([FromBody, Required] RefreshRequest refresh)
+    public async Task<Results<Ok<RefreshResponse>, BadRequest, ForbidHttpResult>> Refresh([FromBody, Required] RefreshRequest request)
     {
         if (ModelState is { IsValid: false })
         {
             return TypedResults.BadRequest();
         }
 
-        var authTokens = new AuthTokens(refresh.AccessToken, refresh.RefreshToken);
-
-        if (auth.IdentifyUser(authTokens).TryGetValue(out var user) is false)
+        return await refreshUseCase.Execute(request) switch
         {
-            return TypedResults.BadRequest();
-        }
-
-        var tokens = auth.Reauthenticate(user, refresh.RefreshToken)
-            .GetValueOrDefault();
-
-        return tokens is { } ? TypedResults.Ok(tokens) : TypedResults.Forbid();
+            { IsSuccess: true, Value: var response } => TypedResults.Ok(response),
+            { Error.Error: var error } => error switch
+            {
+                RefreshError.InvalidCredentials => TypedResults.Forbid(),
+                RefreshError.RefreshExpired => TypedResults.Forbid(),
+                _ => throw new NotImplementedException(),
+            },
+        };
     }
 
     [Authorize]
     [HttpPost("logout")]
-    public Results<Ok, BadRequest> Logout()
+    public async Task<Results<Ok, BadRequest, UnauthorizedHttpResult>> Logout()
     {
         if (ModelState is { IsValid: false })
         {
             return TypedResults.BadRequest();
         }
 
-        if (auth.GetAuthenticatedUser().TryGetValue(out var user) is false)
+        return await logoutUseCase.Execute(Unit.Instance) switch
         {
-
-            return TypedResults.BadRequest();
-        }
-
-        auth.Deauthenticate(user);
-        return TypedResults.Ok();
+            { IsSuccess: true } => TypedResults.Ok(),
+            { Error.Error: var error } => error switch
+            {
+                LogoutError.NotAuthenticated => TypedResults.Unauthorized(),
+                _ => throw new NotImplementedException(),
+            },
+        };
     }
 }

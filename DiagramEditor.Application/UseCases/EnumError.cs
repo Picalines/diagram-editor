@@ -6,6 +6,8 @@ namespace DiagramEditor.Application.UseCases;
 public sealed class EnumError<TEnum>(TEnum error) : IError
     where TEnum : Enum
 {
+    public TEnum Error => error;
+
     public string Message => error.GetDescription().GetValueOrDefault(error.ToString);
 
     public static implicit operator EnumError<TEnum>(TEnum error)
