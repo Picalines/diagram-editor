@@ -1,29 +1,33 @@
 using System.ComponentModel.DataAnnotations;
-using DiagramEditor.Application.Repositories;
-using DiagramEditor.Application.Services.Authentication;
-using DiagramEditor.Domain;
-using DiagramEditor.Domain.Users;
-using DiagramEditor.Web.API.Extensions;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
+using DiagramEditor.Application.UseCases.User.GetCurrent;
+using DiagramEditor.Application.UseCases.User.Register;
+using DiagramEditor.Application.UseCases;
 
 namespace DiagramEditor.Web.API.Controllers;
 
-using CSharpFunctionalExtensions;
-using DiagramEditor.Web.API.Controllers.Requests;
-
 [ApiController]
 [Route("user")]
-public sealed class UserController(IUserRepository users, IAuthenticator auth) : ControllerBase
+public sealed class UserController(
+    IGetCurrentUserUseCase getCurrentUseCase,
+    IRegisterUseCase registerUseCase
+) : ControllerBase
 {
     [Authorize]
     [HttpGet]
-    public Results<Ok<User>, BadRequest> GetCurrentUser()
+    public async Task<Results<Ok<CurrentUserResponse>, UnauthorizedHttpResult>> GetCurrentUser()
     {
-        return auth
-            .GetAuthenticatedUser()
-            .ToTypedResult(TypedResults.Ok, TypedResults.BadRequest);
+        return await getCurrentUseCase.Execute(Unit.Instance) switch
+        {
+            { IsSuccess: true, Value: var response } => TypedResults.Ok(response),
+            { Error.Error: var error } => error switch
+            {
+                GetCurrentUserError.Unauthorized => TypedResults.Unauthorized(),
+                _ => throw new NotImplementedException(),
+            },
+        };
     }
 
     [Authorize]
@@ -35,17 +39,22 @@ public sealed class UserController(IUserRepository users, IAuthenticator auth) :
 
     [AllowAnonymous]
     [HttpPost("register")]
-    public Results<Ok<AuthTokens>, BadRequest<string>> Register([FromBody, Required] RegisterRequest register)
+    public async Task<Results<Ok<RegisterResponse>, BadRequest<EnumError<RegisterError>>>> Register([FromBody, Required] RegisterRequest request)
     {
         if (ModelState is { IsValid: false })
         {
-            return TypedResults.BadRequest("invalid body");
+            return TypedResults.BadRequest(EnumError.From(RegisterError.InvalidLogin));
         }
 
-        return users
-            .Register(register.Login, register.Password)
-            .Map(auth.Authenticate)
-            .MapError(error => error.ToString())
-            .ToTypedResult(TypedResults.Ok, TypedResults.BadRequest);
+        return await registerUseCase.Execute(request) switch
+        {
+            { IsSuccess: true, Value: var response } => TypedResults.Ok(response),
+            { Error: var error } => error.Error switch
+            {
+                RegisterError.InvalidLogin or RegisterError.InvalidPassword or RegisterError.LoginTaken =>
+                    TypedResults.BadRequest(error),
+                _ => throw new NotImplementedException(),
+            },
+        };
     }
 }
