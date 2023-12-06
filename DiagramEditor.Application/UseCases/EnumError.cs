@@ -1,3 +1,4 @@
+using System.Text.Json.Serialization;
 using CSharpFunctionalExtensions;
 using DiagramEditor.Application.Extensions;
 
@@ -6,7 +7,10 @@ namespace DiagramEditor.Application.UseCases;
 public sealed class EnumError<TEnum>(TEnum error) : IError
     where TEnum : Enum
 {
+    [JsonIgnore]
     public TEnum Error => error;
+
+    public string Code => error.ToString();
 
     public string Message => error.GetDescription().GetValueOrDefault(error.ToString);
 
