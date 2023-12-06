@@ -8,7 +8,7 @@ namespace DiagramEditor.Infrastructure.Services.User;
 [Injectable(ServiceLifetime.Singleton)]
 internal sealed partial class BasicLoginValidator : ILoginValidator
 {
-    [GeneratedRegex(@"^[a-zA-Z_]{3..}")]
+    [GeneratedRegex(@"^[a-zA-Z0-9_]{3,}")]
     private static partial Regex LoginRegex();
 
     public bool Validate(string login)
