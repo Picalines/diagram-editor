@@ -16,7 +16,7 @@ public sealed class EnumError<TEnum>(TEnum error) : IError
 
 public static class EnumError
 {
-    public static EnumError<TEnum> Of<TEnum>(TEnum error)
+    public static EnumError<TEnum> From<TEnum>(TEnum error)
         where TEnum : Enum
     {
         return new EnumError<TEnum>(error);

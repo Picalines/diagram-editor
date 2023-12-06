@@ -14,7 +14,7 @@ internal sealed class LoginUseCase(IAuthenticator auth) : ILoginUseCase
         return auth.IdentifyUser(request.Login, request.Password)
             .Map(auth.Authenticate)
             .ToResult(LoginError.InvalidCredentials)
-            .MapError(EnumError.Of)
+            .MapError(EnumError.From)
             .Map(tokens => new LoginResponse(tokens.AccessToken, tokens.RefreshToken))
             .ToCompletedTask();
     }
