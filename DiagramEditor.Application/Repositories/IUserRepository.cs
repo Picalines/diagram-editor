@@ -5,8 +5,9 @@ namespace DiagramEditor.Application.Repositories;
 
 public enum UserCreationError
 {
-    LoginTaken,
+    InvalidLogin,
     InvalidPassword,
+    LoginTaken,
 }
 
 public interface IUserRepository

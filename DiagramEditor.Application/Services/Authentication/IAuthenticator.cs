@@ -1,8 +1,9 @@
 ﻿using CSharpFunctionalExtensions;
 using DiagramEditor.Domain;
-using DiagramEditor.Domain.Users;
 
 namespace DiagramEditor.Application.Services.Authentication;
+
+using DiagramEditor.Domain.Users;
 
 public interface IAuthenticator
 {

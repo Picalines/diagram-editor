@@ -2,6 +2,7 @@
 using DiagramEditor.Application.Attributes;
 using DiagramEditor.Application.Repositories;
 using DiagramEditor.Application.Services.Passwords;
+using DiagramEditor.Application.Services.User;
 using DiagramEditor.Domain.Users;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -10,8 +11,9 @@ namespace DiagramEditor.Infrastructure.Repositories;
 [Injectable(ServiceLifetime.Singleton)]
 internal sealed class UserRepository(
     ApplicationContext context,
-    IPasswordHasher passwordHasher,
-    IPasswordValidator passwordValidator
+    ILoginValidator loginValidator,
+    IPasswordValidator passwordValidator,
+    IPasswordHasher passwordHasher
 ) : IUserRepository
 {
     public Maybe<User> GetById(Guid userId)
@@ -26,6 +28,11 @@ internal sealed class UserRepository(
 
     public Result<User, UserCreationError> Register(string login, string passwordText)
     {
+        if (loginValidator.Validate(login) is false)
+        {
+            return UserCreationError.InvalidLogin;
+        }
+
         if (context.Users.Any(user => user.Login == login))
         {
             return UserCreationError.LoginTaken;
