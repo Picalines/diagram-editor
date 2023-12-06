@@ -2,7 +2,7 @@
 using DiagramEditor.Application.Services.Passwords;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace DiagramEditor.Infrastructure;
+namespace DiagramEditor.Infrastructure.Services.Passwords;
 
 using BCrypt.Net;
 
