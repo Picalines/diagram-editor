@@ -1,42 +1,70 @@
-namespace DiagramEditor.Application.UseCases.Users.UpdateCurrent;
-
-using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
 using DiagramEditor.Application.Attributes;
 using DiagramEditor.Application.Errors;
 using DiagramEditor.Application.Extensions;
 using DiagramEditor.Application.Repositories;
 using DiagramEditor.Application.Services.Authentication;
+using DiagramEditor.Application.Services.Passwords;
+using DiagramEditor.Application.Services.Users;
 using Microsoft.Extensions.DependencyInjection;
 
+namespace DiagramEditor.Application.UseCases.Users.UpdateCurrent;
+
 [Injectable(ServiceLifetime.Singleton)]
-internal sealed class UpdateCurrentUserUseCase(IAuthenticator auth, IUserRepository users)
-    : IUpdateCurrentUserUseCase
+internal sealed class UpdateCurrentUserUseCase(
+    IAuthenticator auth,
+    IUserRepository users,
+    ILoginValidator loginValidator,
+    IPasswordValidator passwordValidator
+) : IUpdateCurrentUserUseCase
 {
     public Task<Result<UpdateCurrentUserResponse, EnumError<UpdateCurrentUserError>>> Execute(
         UpdateCurrentUserRequest request
     )
     {
-        if (auth.GetAuthenticatedUser().TryGetValue(out var user) is false)
+        if (
+            request.Login is { } login
+            && loginValidator.Validate(login, out var loginErrors) is false
+        )
         {
-            return Task.FromResult(
-                (Result<UpdateCurrentUserResponse, EnumError<UpdateCurrentUserError>>)
-                    EnumError.From(UpdateCurrentUserError.Unauthorized)
-            );
+            return Result
+                .Failure<UpdateCurrentUserResponse, UpdateCurrentUserError>(
+                    UpdateCurrentUserError.ValidationError
+                )
+                .MapError(error => EnumError.From(error, loginErrors))
+                .ToCompletedTask();
         }
 
-        var updatedUser = new UpdateUserDto()
+        if (
+            request.Password is { } password
+            && passwordValidator.Validate(password, out var passwordErrors) is false
+        )
         {
-            Login = request.Login,
-            Password = request.Password,
-            DisplayName = request.DisplayName,
-            AvatarUrl = request.AvatarUrl,
-        };
+            return Result
+                .Failure<UpdateCurrentUserResponse, UpdateCurrentUserError>(
+                    UpdateCurrentUserError.ValidationError
+                )
+                .MapError(error => EnumError.From(error, passwordErrors))
+                .ToCompletedTask();
+        }
 
-        return users
-            .Update(user, updatedUser)
-            .Map(user => new UpdateCurrentUserResponse(user))
-            .MapError(error => (UpdateCurrentUserError)error)
+        return auth.GetAuthenticatedUser()
+            .ToResult(UpdateCurrentUserError.Unauthorized)
+            .Bind(user =>
+            {
+                var updatedUser = new UpdateUserDto()
+                {
+                    Login = request.Login,
+                    Password = request.Password,
+                    DisplayName = request.DisplayName,
+                    AvatarUrl = request.AvatarUrl,
+                };
+
+                return users
+                    .Update(user, updatedUser)
+                    .Map(user => new UpdateCurrentUserResponse(user))
+                    .MapError(error => error.CastTo<UpdateCurrentUserError>());
+            })
             .MapError(EnumError.From)
             .ToCompletedTask();
     }

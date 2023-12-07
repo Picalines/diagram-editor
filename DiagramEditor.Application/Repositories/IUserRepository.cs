@@ -5,15 +5,11 @@ namespace DiagramEditor.Application.Repositories;
 
 public enum UserCreationError
 {
-    InvalidLogin,
-    InvalidPassword,
     LoginTaken,
 }
 
 public enum UserUpdateError
 {
-    InvalidLogin,
-    InvalidPassword,
     LoginTaken,
 }
 

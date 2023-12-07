@@ -1,6 +1,5 @@
 namespace DiagramEditor.Application.Services.Users;
 
-public interface ILoginValidator
+public interface ILoginValidator : IValidator<string>
 {
-    public bool Validate(string login);
 }

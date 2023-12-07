@@ -3,19 +3,14 @@ using DiagramEditor.Application.Attributes;
 using DiagramEditor.Application.Extensions;
 using DiagramEditor.Application.Repositories;
 using DiagramEditor.Application.Services.Passwords;
-using DiagramEditor.Application.Services.Users;
 using DiagramEditor.Domain.Users;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace DiagramEditor.Infrastructure.Repositories;
 
 [Injectable(ServiceLifetime.Singleton)]
-internal sealed class UserRepository(
-    ApplicationContext context,
-    ILoginValidator loginValidator,
-    IPasswordValidator passwordValidator,
-    IPasswordHasher passwordHasher
-) : IUserRepository
+internal sealed class UserRepository(ApplicationContext context, IPasswordHasher passwordHasher)
+    : IUserRepository
 {
     public Maybe<User> GetById(Guid userId)
     {
@@ -29,19 +24,9 @@ internal sealed class UserRepository(
 
     public Result<User, UserCreationError> Register(string login, string passwordText)
     {
-        if (loginValidator.Validate(login) is false)
-        {
-            return UserCreationError.InvalidLogin;
-        }
-
         if (context.Users.Any(user => user.Login == login))
         {
             return UserCreationError.LoginTaken;
-        }
-
-        if (passwordValidator.Validate(passwordText) is false)
-        {
-            return UserCreationError.InvalidPassword;
         }
 
         var user = new User(login, passwordHasher.Hash(passwordText));
@@ -54,17 +39,15 @@ internal sealed class UserRepository(
 
     public Result<User, UserUpdateError> Update(User user, UpdateUserDto updatedUser)
     {
-        if (updatedUser.Login is { } login && loginValidator.Validate(login) is false)
+        if (updatedUser.Login is { } login)
         {
-            return UserUpdateError.InvalidLogin;
-        }
+            if (context.Users.Any(user => user.Login == login))
+            {
+                return UserUpdateError.LoginTaken;
+            }
 
-        if (updatedUser.Password is { } password && passwordValidator.Validate(password) is false)
-        {
-            return UserUpdateError.InvalidPassword;
+            user.Login = login;
         }
-
-        updatedUser.Login.IfNotNull(login => user.Login = login);
 
         updatedUser
             .Password

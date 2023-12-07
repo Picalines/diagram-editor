@@ -1,6 +1,5 @@
 ﻿namespace DiagramEditor.Application.Services.Passwords;
 
-public interface IPasswordValidator
+public interface IPasswordValidator : IValidator<string>
 {
-    public bool Validate(string passwordText);
 }

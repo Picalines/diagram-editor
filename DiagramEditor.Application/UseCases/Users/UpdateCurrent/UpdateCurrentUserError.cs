@@ -4,8 +4,7 @@ using DiagramEditor.Application.Repositories;
 
 public enum UpdateCurrentUserError
 {
-    InvalidLogin = UserUpdateError.InvalidLogin,
-    InvalidPassword = UserUpdateError.InvalidPassword,
     LoginTaken = UserUpdateError.LoginTaken,
+    ValidationError,
     Unauthorized,
 }

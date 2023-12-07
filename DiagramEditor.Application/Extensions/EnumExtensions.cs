@@ -23,4 +23,22 @@ public static class EnumExtensions
 
         return description.AsMaybe();
     }
+
+    public static int ToInt(this Enum enumValue)
+    {
+        return (int)(object)enumValue;
+    }
+
+    public static T CastTo<T>(this Enum enumValue)
+        where T : struct, Enum
+    {
+        var casted = (T)(object)enumValue.ToInt();
+
+        if (Enum.GetValues<T>().Contains(casted) is false)
+        {
+            throw new InvalidCastException($"cannot cast value {enumValue} to {typeof(T)}");
+        }
+
+        return casted;
+    }
 }
