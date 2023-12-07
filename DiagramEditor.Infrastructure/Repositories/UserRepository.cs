@@ -3,7 +3,7 @@ using DiagramEditor.Application.Attributes;
 using DiagramEditor.Application.Extensions;
 using DiagramEditor.Application.Repositories;
 using DiagramEditor.Application.Services.Passwords;
-using DiagramEditor.Application.Services.User;
+using DiagramEditor.Application.Services.Users;
 using DiagramEditor.Domain.Users;
 using Microsoft.Extensions.DependencyInjection;
 

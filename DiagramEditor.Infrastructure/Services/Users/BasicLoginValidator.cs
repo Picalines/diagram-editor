@@ -1,9 +1,9 @@
 using System.Text.RegularExpressions;
 using DiagramEditor.Application.Attributes;
-using DiagramEditor.Application.Services.User;
+using DiagramEditor.Application.Services.Users;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace DiagramEditor.Infrastructure.Services.User;
+namespace DiagramEditor.Infrastructure.Services.Users;
 
 [Injectable(ServiceLifetime.Singleton)]
 internal sealed partial class BasicLoginValidator : ILoginValidator

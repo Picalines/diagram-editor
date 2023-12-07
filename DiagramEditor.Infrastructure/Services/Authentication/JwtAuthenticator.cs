@@ -13,10 +13,9 @@ using DiagramEditor.Infrastructure.Configuration.Authentication;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
+using DiagramEditor.Domain.Users;
 
 namespace DiagramEditor.Infrastructure.Services.Authentication;
-
-using DiagramEditor.Domain.Users;
 
 [Injectable(ServiceLifetime.Singleton)]
 internal sealed class JwtAuthenticator(

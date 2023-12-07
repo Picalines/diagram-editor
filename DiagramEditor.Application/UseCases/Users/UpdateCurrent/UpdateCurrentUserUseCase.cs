@@ -1,4 +1,4 @@
-namespace DiagramEditor.Application.UseCases.User.UpdateCurrent;
+namespace DiagramEditor.Application.UseCases.Users.UpdateCurrent;
 
 using System.Threading.Tasks;
 using CSharpFunctionalExtensions;

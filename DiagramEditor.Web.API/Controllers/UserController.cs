@@ -2,9 +2,9 @@ using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
-using DiagramEditor.Application.UseCases.User.GetCurrent;
-using DiagramEditor.Application.UseCases.User.Register;
-using DiagramEditor.Application.UseCases.User.UpdateCurrent;
+using DiagramEditor.Application.UseCases.Users.GetCurrent;
+using DiagramEditor.Application.UseCases.Users.Register;
+using DiagramEditor.Application.UseCases.Users.UpdateCurrent;
 using DiagramEditor.Application.UseCases;
 
 namespace DiagramEditor.Web.API.Controllers;

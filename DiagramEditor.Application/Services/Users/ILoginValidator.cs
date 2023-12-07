@@ -1,4 +1,4 @@
-namespace DiagramEditor.Application.Services.User;
+namespace DiagramEditor.Application.Services.Users;
 
 public interface ILoginValidator
 {

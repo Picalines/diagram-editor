@@ -1,6 +1,6 @@
 using DiagramEditor.Application.Repositories;
 
-namespace DiagramEditor.Application.UseCases.User.Register;
+namespace DiagramEditor.Application.UseCases.Users.Register;
 
 public enum RegisterError
 {

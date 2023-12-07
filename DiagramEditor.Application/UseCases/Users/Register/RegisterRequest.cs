@@ -1,4 +1,4 @@
-namespace DiagramEditor.Application.UseCases.User.Register;
+namespace DiagramEditor.Application.UseCases.Users.Register;
 
 public sealed record RegisterRequest : IRequest
 {

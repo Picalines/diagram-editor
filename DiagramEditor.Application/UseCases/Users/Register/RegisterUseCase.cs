@@ -5,7 +5,7 @@ using DiagramEditor.Application.Repositories;
 using DiagramEditor.Application.Services.Authentication;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace DiagramEditor.Application.UseCases.User.Register;
+namespace DiagramEditor.Application.UseCases.Users.Register;
 
 [Injectable(ServiceLifetime.Singleton)]
 internal sealed class RegisterUseCase(IAuthenticator auth, IUserRepository users) : IRegisterUseCase

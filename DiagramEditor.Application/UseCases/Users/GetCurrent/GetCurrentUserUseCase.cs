@@ -4,7 +4,7 @@ using DiagramEditor.Application.Extensions;
 using DiagramEditor.Application.Services.Authentication;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace DiagramEditor.Application.UseCases.User.GetCurrent;
+namespace DiagramEditor.Application.UseCases.Users.GetCurrent;
 
 [Injectable(ServiceLifetime.Singleton)]
 internal sealed class GetCurrentUserUseCase(IAuthenticator auth) : IGetCurrentUserUseCase
