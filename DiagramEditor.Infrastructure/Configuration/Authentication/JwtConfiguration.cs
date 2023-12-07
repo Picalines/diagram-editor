@@ -9,11 +9,14 @@ namespace DiagramEditor.Infrastructure.Configuration.Authentication;
 
 internal static class JwtConfiguration
 {
-    public static void AddJwtBearerServices(IServiceCollection services, IConfiguration configuration)
+    public static void AddJwtBearerServices(
+        IServiceCollection services,
+        IConfiguration configuration
+    )
     {
         var jwtConfiguration =
-                    configuration.GetSection("Jwt").Get<JwtConfigurationSection>()
-                    ?? throw new InvalidOperationException("invalid Jwt configuration");
+            configuration.GetSection("Jwt").Get<JwtConfigurationSection>()
+            ?? throw new InvalidOperationException("invalid Jwt configuration");
 
         services.AddSingleton(jwtConfiguration);
 

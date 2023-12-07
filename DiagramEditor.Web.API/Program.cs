@@ -11,18 +11,19 @@ builder.Services.AddHttpContextAccessor();
 
 builder.Services.AddControllers();
 
-builder.Services
-    .AddApplication()
-    .AddInfrastructure(builder.Configuration);
+builder.Services.AddApplication().AddInfrastructure(builder.Configuration);
 
 builder.Services.AddSwagger();
 
-builder.Services.AddCors(
-    options => options.AddPolicy("AllowAll", builder => builder
-        .AllowAnyHeader()
-        .AllowAnyMethod()
-        .AllowAnyOrigin())
-);
+builder
+    .Services
+    .AddCors(
+        options =>
+            options.AddPolicy(
+                "AllowAll",
+                builder => builder.AllowAnyHeader().AllowAnyMethod().AllowAnyOrigin()
+            )
+    );
 
 var app = builder.Build();
 

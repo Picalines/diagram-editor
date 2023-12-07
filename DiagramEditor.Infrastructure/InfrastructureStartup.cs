@@ -8,7 +8,10 @@ namespace DiagramEditor.Infrastructure;
 
 public static class InfrastructureStartup
 {
-    public static IServiceCollection AddInfrastructure(this IServiceCollection services, IConfiguration configuration)
+    public static IServiceCollection AddInfrastructure(
+        this IServiceCollection services,
+        IConfiguration configuration
+    )
     {
         MySqlConfiguration.AddMySql(services, configuration);
         RedisConfiguration.AddRedis(services, configuration);

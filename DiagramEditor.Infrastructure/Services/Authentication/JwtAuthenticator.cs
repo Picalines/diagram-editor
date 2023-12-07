@@ -9,11 +9,11 @@ using DiagramEditor.Application.Repositories;
 using DiagramEditor.Application.Services.Authentication;
 using DiagramEditor.Application.Services.Passwords;
 using DiagramEditor.Domain;
+using DiagramEditor.Domain.Users;
 using DiagramEditor.Infrastructure.Configuration.Authentication;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
-using DiagramEditor.Domain.Users;
 
 namespace DiagramEditor.Infrastructure.Services.Authentication;
 
@@ -93,7 +93,11 @@ internal sealed class JwtAuthenticator(
         try
         {
             var tokenHandler = new JwtSecurityTokenHandler();
-            principal = tokenHandler.ValidateToken(authTokens.AccessToken, validationParameters, out var securityToken);
+            principal = tokenHandler.ValidateToken(
+                authTokens.AccessToken,
+                validationParameters,
+                out var securityToken
+            );
         }
         catch
         {

@@ -7,7 +7,10 @@ namespace DiagramEditor.Application.Extensions;
 
 public static class ScrutorExtensions
 {
-    public static IImplementationTypeSelector InjectableAttribute(this IImplementationTypeSelector selector, ServiceLifetime lifeTime)
+    public static IImplementationTypeSelector InjectableAttribute(
+        this IImplementationTypeSelector selector,
+        ServiceLifetime lifeTime
+    )
     {
         return selector
             .AddClasses(c => c.WithAttribute<InjectableAttribute>(i => i.Lifetime == lifeTime))
@@ -16,7 +19,9 @@ public static class ScrutorExtensions
             .WithLifetime(lifeTime);
     }
 
-    public static IImplementationTypeSelector InjectableAttributes(this IImplementationTypeSelector selector)
+    public static IImplementationTypeSelector InjectableAttributes(
+        this IImplementationTypeSelector selector
+    )
     {
         foreach (var item in Enum.GetValues<ServiceLifetime>())
         {
@@ -26,7 +31,9 @@ public static class ScrutorExtensions
         return selector;
     }
 
-    public static IServiceCollection AddInjectableFromCallingAssembly(this IServiceCollection services)
+    public static IServiceCollection AddInjectableFromCallingAssembly(
+        this IServiceCollection services
+    )
     {
         var assembly = Assembly.GetCallingAssembly();
         return services.Scan(selector => selector.FromAssemblies(assembly).InjectableAttributes());

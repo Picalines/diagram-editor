@@ -1,9 +1,9 @@
-﻿using Microsoft.AspNetCore.Mvc.ApiExplorer;
+﻿using System.Runtime.CompilerServices;
+using DiagramEditor.Application.Extensions;
+using Microsoft.AspNetCore.Mvc.ApiExplorer;
 using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.SwaggerGen;
 using Vernou.Swashbuckle.HttpResultsAdapter;
-using System.Runtime.CompilerServices;
-using DiagramEditor.Application.Extensions;
 
 namespace DiagramEditor.Web.API.Configuration;
 
@@ -30,30 +30,35 @@ internal static class SwaggerConfiguration
 
         options.CustomOperationIds(GetOperationId);
 
-        options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
-        {
-            In = ParameterLocation.Header,
-            Description = "Enter a valid JSON web token here",
-            Name = "Authorization",
-            Type = SecuritySchemeType.Http,
-            BearerFormat = "JWT",
-            Scheme = "Bearer"
-        });
-
-        options.AddSecurityRequirement(new OpenApiSecurityRequirement
-        {
+        options.AddSecurityDefinition(
+            "Bearer",
+            new OpenApiSecurityScheme
             {
-                new OpenApiSecurityScheme
-                {
-                    Reference = new OpenApiReference
-                    {
-                        Type = ReferenceType.SecurityScheme,
-                        Id = "Bearer"
-                    }
-                },
-                [ ]
+                In = ParameterLocation.Header,
+                Description = "Enter a valid JSON web token here",
+                Name = "Authorization",
+                Type = SecuritySchemeType.Http,
+                BearerFormat = "JWT",
+                Scheme = "Bearer"
             }
-        });
+        );
+
+        options.AddSecurityRequirement(
+            new OpenApiSecurityRequirement
+            {
+                {
+                    new OpenApiSecurityScheme
+                    {
+                        Reference = new OpenApiReference
+                        {
+                            Type = ReferenceType.SecurityScheme,
+                            Id = "Bearer"
+                        }
+                    },
+                    []
+                }
+            }
+        );
     }
 
     private static string? GetOperationId(ApiDescription apiDescription)

@@ -16,7 +16,14 @@ internal sealed class RegisterUseCase(IAuthenticator auth, IUserRepository users
             .Register(request.Login, request.Password)
             .MapError(error => EnumError.From((RegisterError)error))
             .Map(auth.Authenticate)
-            .Map(tokens => new RegisterResponse { AccessToken = tokens.AccessToken, RefreshToken = tokens.RefreshToken })
+            .Map(
+                tokens =>
+                    new RegisterResponse
+                    {
+                        AccessToken = tokens.AccessToken,
+                        RefreshToken = tokens.RefreshToken
+                    }
+            )
             .ToCompletedTask();
     }
 }

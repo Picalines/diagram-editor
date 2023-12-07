@@ -23,7 +23,6 @@ public static class StringExtensions
     }
 
     public static string AddSuffix(this string str, string suffix)
-
     {
         return str.EndsWith(suffix) ? str : str + suffix;
     }

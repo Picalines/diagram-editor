@@ -20,7 +20,9 @@ public sealed class AuthController(
 {
     [AllowAnonymous]
     [HttpPost("login")]
-    public async Task<Results<Ok<LoginResponse>, BadRequest, UnauthorizedHttpResult>> Login([FromBody, Required] LoginRequest request)
+    public async Task<Results<Ok<LoginResponse>, BadRequest, UnauthorizedHttpResult>> Login(
+        [FromBody, Required] LoginRequest request
+    )
     {
         if (ModelState is { IsValid: false })
         {
@@ -30,17 +32,20 @@ public sealed class AuthController(
         return await loginUseCase.Execute(request) switch
         {
             { IsSuccess: true, Value: var response } => TypedResults.Ok(response),
-            { Error.Error: var error } => error switch
-            {
-                LoginError.InvalidCredentials => TypedResults.Unauthorized(),
-                _ => throw new NotImplementedException(),
-            },
+            { Error.Error: var error }
+                => error switch
+                {
+                    LoginError.InvalidCredentials => TypedResults.Unauthorized(),
+                    _ => throw new NotImplementedException(),
+                },
         };
     }
 
     [AllowAnonymous]
     [HttpPost("refresh")]
-    public async Task<Results<Ok<RefreshResponse>, BadRequest, ForbidHttpResult>> Refresh([FromBody, Required] RefreshRequest request)
+    public async Task<Results<Ok<RefreshResponse>, BadRequest, ForbidHttpResult>> Refresh(
+        [FromBody, Required] RefreshRequest request
+    )
     {
         if (ModelState is { IsValid: false })
         {
@@ -50,12 +55,13 @@ public sealed class AuthController(
         return await refreshUseCase.Execute(request) switch
         {
             { IsSuccess: true, Value: var response } => TypedResults.Ok(response),
-            { Error.Error: var error } => error switch
-            {
-                RefreshError.InvalidCredentials => TypedResults.Forbid(),
-                RefreshError.RefreshExpired => TypedResults.Forbid(),
-                _ => throw new NotImplementedException(),
-            },
+            { Error.Error: var error }
+                => error switch
+                {
+                    RefreshError.InvalidCredentials => TypedResults.Forbid(),
+                    RefreshError.RefreshExpired => TypedResults.Forbid(),
+                    _ => throw new NotImplementedException(),
+                },
         };
     }
 
@@ -71,11 +77,12 @@ public sealed class AuthController(
         return await logoutUseCase.Execute(Unit.Instance) switch
         {
             { IsSuccess: true } => TypedResults.Ok(),
-            { Error.Error: var error } => error switch
-            {
-                LogoutError.NotAuthenticated => TypedResults.Unauthorized(),
-                _ => throw new NotImplementedException(),
-            },
+            { Error.Error: var error }
+                => error switch
+                {
+                    LogoutError.NotAuthenticated => TypedResults.Unauthorized(),
+                    _ => throw new NotImplementedException(),
+                },
         };
     }
 }

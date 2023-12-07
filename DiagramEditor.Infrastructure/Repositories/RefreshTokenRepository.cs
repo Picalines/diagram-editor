@@ -1,7 +1,6 @@
 ﻿using CSharpFunctionalExtensions;
 using DiagramEditor.Application;
 using DiagramEditor.Application.Attributes;
-using DiagramEditor.Domain.Users;
 using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -17,10 +16,7 @@ internal class RefreshTokenRepository(IDistributedCache cache) : IRefreshTokenRe
 
     public void SetToken(Guid userId, string token, DateTime expirationDate)
     {
-        cache.SetString(GuidToKey(userId), token, new()
-        {
-            AbsoluteExpiration = expirationDate,
-        });
+        cache.SetString(GuidToKey(userId), token, new() { AbsoluteExpiration = expirationDate, });
     }
 
     public void DeleteToken(Guid userId)

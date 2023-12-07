@@ -65,8 +65,13 @@ internal sealed class UserRepository(
         }
 
         updatedUser.Login.IfNotNull(login => user.Login = login);
-        updatedUser.Password.IfNotNull(password => user.PasswordHash = passwordHasher.Hash(password));
+
+        updatedUser
+            .Password
+            .IfNotNull(password => user.PasswordHash = passwordHasher.Hash(password));
+
         updatedUser.DisplayName.IfNotNull(displayName => user.DisplayName = displayName);
+
         updatedUser.AvatarUrl.IfNotNull(avatarUrl => user.AvatarUrl = avatarUrl);
 
         context.SaveChanges();

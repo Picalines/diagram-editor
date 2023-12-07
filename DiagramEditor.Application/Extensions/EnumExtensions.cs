@@ -12,9 +12,11 @@ public static class EnumExtensions
     {
         if (_cachedDescriptions.TryGetValue(enumValue, out var description) is false)
         {
-            description = enumValue.GetType()
+            description = enumValue
+                .GetType()
                 .GetField(enumValue.ToString())!
-                .GetCustomAttribute<DescriptionAttribute>()?.Description;
+                .GetCustomAttribute<DescriptionAttribute>()
+                ?.Description;
 
             _cachedDescriptions.Add(enumValue, description);
         }

@@ -6,9 +6,13 @@ namespace DiagramEditor.Infrastructure;
 
 internal static class MySqlConfiguration
 {
-    public static IServiceCollection AddMySql(this IServiceCollection services, IConfiguration configuration)
+    public static IServiceCollection AddMySql(
+        this IServiceCollection services,
+        IConfiguration configuration
+    )
     {
-        var mySqlConfiguration = configuration.Get<MySqlConfigurationSection>()
+        var mySqlConfiguration =
+            configuration.Get<MySqlConfigurationSection>()
             ?? throw new InvalidOperationException("invalid MySql configuration");
 
         services.AddSingleton(mySqlConfiguration);

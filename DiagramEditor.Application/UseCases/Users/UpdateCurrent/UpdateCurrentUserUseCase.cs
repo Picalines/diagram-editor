@@ -9,15 +9,19 @@ using DiagramEditor.Application.Services.Authentication;
 using Microsoft.Extensions.DependencyInjection;
 
 [Injectable(ServiceLifetime.Singleton)]
-internal sealed class UpdateCurrentUserUseCase(IAuthenticator auth, IUserRepository users) : IUpdateCurrentUserUseCase
+internal sealed class UpdateCurrentUserUseCase(IAuthenticator auth, IUserRepository users)
+    : IUpdateCurrentUserUseCase
 {
-    public Task<Result<UpdateCurrentUserResponse, EnumError<UpdateCurrentUserError>>> Execute(UpdateCurrentUserRequest request)
+    public Task<Result<UpdateCurrentUserResponse, EnumError<UpdateCurrentUserError>>> Execute(
+        UpdateCurrentUserRequest request
+    )
     {
         if (auth.GetAuthenticatedUser().TryGetValue(out var user) is false)
         {
             return Task.FromResult(
                 (Result<UpdateCurrentUserResponse, EnumError<UpdateCurrentUserError>>)
-                    EnumError.From(UpdateCurrentUserError.Unauthorized));
+                    EnumError.From(UpdateCurrentUserError.Unauthorized)
+            );
         }
 
         var updatedUser = new UpdateUserDto()
@@ -28,7 +32,8 @@ internal sealed class UpdateCurrentUserUseCase(IAuthenticator auth, IUserReposit
             AvatarUrl = request.AvatarUrl,
         };
 
-        return users.Update(user, updatedUser)
+        return users
+            .Update(user, updatedUser)
             .Map(user => new UpdateCurrentUserResponse(user))
             .MapError(error => (UpdateCurrentUserError)error)
             .MapError(EnumError.From)
