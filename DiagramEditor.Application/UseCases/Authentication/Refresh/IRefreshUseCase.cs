@@ -1,3 +1,5 @@
+using DiagramEditor.Application.Errors;
+
 namespace DiagramEditor.Application.UseCases.Authentication.Refresh;
 
 public interface IRefreshUseCase

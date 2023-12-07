@@ -1,4 +1,4 @@
-namespace DiagramEditor.Application.UseCases;
+namespace DiagramEditor.Application.Errors;
 
 public interface IError
 {

@@ -1,7 +1,7 @@
 using CSharpFunctionalExtensions;
 using DiagramEditor.Application.Extensions;
 
-namespace DiagramEditor.Application.UseCases;
+namespace DiagramEditor.Application.Errors;
 
 public sealed class EnumError<TEnum>(TEnum error) : IError
     where TEnum : Enum

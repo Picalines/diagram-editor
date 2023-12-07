@@ -1,4 +1,5 @@
 using CSharpFunctionalExtensions;
+using DiagramEditor.Application.Errors;
 
 namespace DiagramEditor.Application.UseCases;
 

@@ -3,6 +3,7 @@ namespace DiagramEditor.Application.UseCases.Users.UpdateCurrent;
 using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
 using DiagramEditor.Application.Attributes;
+using DiagramEditor.Application.Errors;
 using DiagramEditor.Application.Extensions;
 using DiagramEditor.Application.Repositories;
 using DiagramEditor.Application.Services.Authentication;
