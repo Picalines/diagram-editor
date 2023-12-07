@@ -4,9 +4,8 @@ using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using DiagramEditor.Application.UseCases.User.GetCurrent;
 using DiagramEditor.Application.UseCases.User.Register;
-using DiagramEditor.Application.UseCases;
 using DiagramEditor.Application.UseCases.User.UpdateCurrent;
-using DiagramEditor.Application.Repositories;
+using DiagramEditor.Application.UseCases;
 
 namespace DiagramEditor.Web.API.Controllers;
 
@@ -35,8 +34,18 @@ public sealed class UserController(
 
     [Authorize]
     [HttpPut]
-    public async Task<Results<Ok<UpdateCurrentUserResponse>, BadRequest<EnumError<UpdateCurrentUserError>>, UnauthorizedHttpResult>> EditCurrentUser([FromBody, Required] UpdateCurrentUserRequest request)
+    public async Task<Results<
+        Ok<UpdateCurrentUserResponse>,
+        BadRequest,
+        BadRequest<EnumError<UpdateCurrentUserError>>,
+        UnauthorizedHttpResult
+    >> EditCurrentUser([FromBody, Required] UpdateCurrentUserRequest request)
     {
+        if (ModelState is { IsValid: false })
+        {
+            return TypedResults.BadRequest();
+        }
+
         return await updateCurrentUseCase.Execute(request) switch
         {
             { IsSuccess: true, Value: var response } => TypedResults.Ok(response),
@@ -53,11 +62,15 @@ public sealed class UserController(
 
     [AllowAnonymous]
     [HttpPost("register")]
-    public async Task<Results<Ok<RegisterResponse>, BadRequest<EnumError<RegisterError>>>> Register([FromBody, Required] RegisterRequest request)
+    public async Task<Results<
+        Ok<RegisterResponse>,
+        BadRequest,
+        BadRequest<EnumError<RegisterError>>
+    >> Register([FromBody, Required] RegisterRequest request)
     {
         if (ModelState is { IsValid: false })
         {
-            return TypedResults.BadRequest(EnumError.From(RegisterError.InvalidLogin));
+            return TypedResults.BadRequest();
         }
 
         return await registerUseCase.Execute(request) switch
