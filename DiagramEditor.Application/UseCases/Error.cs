@@ -1,3 +1,3 @@
 namespace DiagramEditor.Application.UseCases;
 
-public sealed record Error(string Message) : IError;
+public sealed record Error(string Code, string Message) : IError;

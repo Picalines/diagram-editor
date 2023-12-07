@@ -36,14 +36,13 @@ public sealed class UserController(
     [HttpPut]
     public async Task<Results<
         Ok<UpdateCurrentUserResponse>,
-        BadRequest,
-        BadRequest<EnumError<UpdateCurrentUserError>>,
+        BadRequest<EnumError<UpdateCurrentUserError>?>,
         UnauthorizedHttpResult
     >> EditCurrentUser([FromBody, Required] UpdateCurrentUserRequest request)
     {
         if (ModelState is { IsValid: false })
         {
-            return TypedResults.BadRequest();
+            return TypedResults.BadRequest<EnumError<UpdateCurrentUserError>?>(null);
         }
 
         return await updateCurrentUseCase.Execute(request) switch
@@ -54,7 +53,8 @@ public sealed class UserController(
                 UpdateCurrentUserError.Unauthorized => TypedResults.Unauthorized(),
                 UpdateCurrentUserError.InvalidLogin
                 or UpdateCurrentUserError.InvalidPassword
-                or UpdateCurrentUserError.LoginTaken => TypedResults.BadRequest(error),
+                or UpdateCurrentUserError.LoginTaken =>
+                    TypedResults.BadRequest<EnumError<UpdateCurrentUserError>?>(error),
                 _ => throw new NotImplementedException(),
             },
         };
@@ -64,13 +64,12 @@ public sealed class UserController(
     [HttpPost("register")]
     public async Task<Results<
         Ok<RegisterResponse>,
-        BadRequest,
-        BadRequest<EnumError<RegisterError>>
+        BadRequest<EnumError<RegisterError>?>
     >> Register([FromBody, Required] RegisterRequest request)
     {
         if (ModelState is { IsValid: false })
         {
-            return TypedResults.BadRequest();
+            return TypedResults.BadRequest<EnumError<RegisterError>?>(null);
         }
 
         return await registerUseCase.Execute(request) switch
@@ -79,7 +78,7 @@ public sealed class UserController(
             { Error: var error } => error.Error switch
             {
                 RegisterError.InvalidLogin or RegisterError.InvalidPassword or RegisterError.LoginTaken =>
-                    TypedResults.BadRequest(error),
+                    TypedResults.BadRequest<EnumError<RegisterError>?>(error),
                 _ => throw new NotImplementedException(),
             },
         };
