@@ -1,5 +1,6 @@
 ﻿using CSharpFunctionalExtensions;
 using DiagramEditor.Application.Attributes;
+using DiagramEditor.Application.Extensions;
 using DiagramEditor.Application.Repositories;
 using DiagramEditor.Application.Services.Passwords;
 using DiagramEditor.Application.Services.User;
@@ -46,6 +47,28 @@ internal sealed class UserRepository(
         var user = new User(login, passwordHasher.Hash(passwordText));
 
         context.Users.Add(user);
+        context.SaveChanges();
+
+        return user;
+    }
+
+    public Result<User, UserUpdateError> Update(User user, UpdateUserDto updatedUser)
+    {
+        if (updatedUser.Login is { } login && loginValidator.Validate(login) is false)
+        {
+            return UserUpdateError.InvalidLogin;
+        }
+
+        if (updatedUser.Password is { } password && passwordValidator.Validate(password) is false)
+        {
+            return UserUpdateError.InvalidPassword;
+        }
+
+        updatedUser.Login.IfNotNull(login => user.Login = login);
+        updatedUser.Password.IfNotNull(password => user.PasswordHash = passwordHasher.Hash(password));
+        updatedUser.DisplayName.IfNotNull(displayName => user.DisplayName = displayName);
+        updatedUser.AvatarUrl.IfNotNull(avatarUrl => user.AvatarUrl = avatarUrl);
+
         context.SaveChanges();
 
         return user;

@@ -5,6 +5,8 @@ using Microsoft.AspNetCore.Mvc;
 using DiagramEditor.Application.UseCases.User.GetCurrent;
 using DiagramEditor.Application.UseCases.User.Register;
 using DiagramEditor.Application.UseCases;
+using DiagramEditor.Application.UseCases.User.UpdateCurrent;
+using DiagramEditor.Application.Repositories;
 
 namespace DiagramEditor.Web.API.Controllers;
 
@@ -12,6 +14,7 @@ namespace DiagramEditor.Web.API.Controllers;
 [Route("user")]
 public sealed class UserController(
     IGetCurrentUserUseCase getCurrentUseCase,
+    IUpdateCurrentUserUseCase updateCurrentUseCase,
     IRegisterUseCase registerUseCase
 ) : ControllerBase
 {
@@ -32,9 +35,20 @@ public sealed class UserController(
 
     [Authorize]
     [HttpPut]
-    public IActionResult EditCurrentUser()
+    public async Task<Results<Ok<UpdateCurrentUserResponse>, BadRequest<EnumError<UpdateCurrentUserError>>, UnauthorizedHttpResult>> EditCurrentUser([FromBody, Required] UpdateCurrentUserRequest request)
     {
-        throw new NotImplementedException();
+        return await updateCurrentUseCase.Execute(request) switch
+        {
+            { IsSuccess: true, Value: var response } => TypedResults.Ok(response),
+            { Error: var error } => error.Error switch
+            {
+                UpdateCurrentUserError.Unauthorized => TypedResults.Unauthorized(),
+                UpdateCurrentUserError.InvalidLogin
+                or UpdateCurrentUserError.InvalidPassword
+                or UpdateCurrentUserError.LoginTaken => TypedResults.BadRequest(error),
+                _ => throw new NotImplementedException(),
+            },
+        };
     }
 
     [AllowAnonymous]
