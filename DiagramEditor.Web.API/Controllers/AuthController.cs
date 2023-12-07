@@ -1,5 +1,4 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using System.Transactions;
 using DiagramEditor.Application.UseCases;
 using DiagramEditor.Application.UseCases.Authentication.Login;
 using DiagramEditor.Application.UseCases.Authentication.Logout;
