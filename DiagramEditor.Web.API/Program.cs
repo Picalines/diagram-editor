@@ -9,7 +9,7 @@ builder.Configuration.AddEnvironmentVariables();
 
 builder.Services.AddHttpContextAccessor();
 
-builder.Services.AddControllers();
+builder.Services.AddControllers().AddJsonOptions();
 
 builder.Services.AddApplication().AddInfrastructure(builder.Configuration);
 
