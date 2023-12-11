@@ -15,13 +15,13 @@ public enum UserUpdateError
 
 public sealed record UpdateUserDto
 {
-    public string? Login { get; init; }
+    public Maybe<string> Login { get; init; }
 
-    public string? Password { get; init; }
+    public Maybe<string> Password { get; init; }
 
-    public string? DisplayName { get; init; }
+    public Maybe<string> DisplayName { get; init; }
 
-    public string? AvatarUrl { get; init; }
+    public Maybe<string> AvatarUrl { get; init; }
 }
 
 public interface IUserRepository

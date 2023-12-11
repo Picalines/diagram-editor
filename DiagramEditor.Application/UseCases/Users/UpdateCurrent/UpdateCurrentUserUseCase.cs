@@ -23,7 +23,7 @@ internal sealed class UpdateCurrentUserUseCase(
     )
     {
         if (
-            request.Login is { } login
+            request.Login.TryGetValue(out var login)
             && loginValidator.Validate(login, out var loginErrors) is false
         )
         {
@@ -36,7 +36,7 @@ internal sealed class UpdateCurrentUserUseCase(
         }
 
         if (
-            request.Password is { } password
+            request.Password.TryGetValue(out var password)
             && passwordValidator.Validate(password, out var passwordErrors) is false
         )
         {

@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using DiagramEditor.Application.Errors;
 using DiagramEditor.Application.UseCases;
 using DiagramEditor.Application.UseCases.Users.GetCurrent;
 using DiagramEditor.Application.UseCases.Users.Register;
@@ -55,8 +56,7 @@ public sealed class UserController(
                 => error.Error switch
                 {
                     UpdateCurrentUserError.Unauthorized => TypedResults.Unauthorized(),
-                    UpdateCurrentUserError.InvalidLogin
-                    or UpdateCurrentUserError.InvalidPassword
+                    UpdateCurrentUserError.ValidationError
                     or UpdateCurrentUserError.LoginTaken
                         => TypedResults.BadRequest<EnumError<UpdateCurrentUserError>?>(error),
                     _ => throw new NotImplementedException(),
@@ -65,7 +65,7 @@ public sealed class UserController(
     }
 
     [AllowAnonymous]
-    [HttpPost("register")]
+    [HttpPost]
     public async Task<
         Results<Ok<RegisterResponse>, BadRequest<EnumError<RegisterError>?>>
     > Register([FromBody, Required] RegisterRequest request)
@@ -81,8 +81,7 @@ public sealed class UserController(
             { Error: var error }
                 => error.Error switch
                 {
-                    RegisterError.InvalidLogin
-                    or RegisterError.InvalidPassword
+                    RegisterError.ValidationError
                     or RegisterError.LoginTaken
                         => TypedResults.BadRequest<EnumError<RegisterError>?>(error),
                     _ => throw new NotImplementedException(),
