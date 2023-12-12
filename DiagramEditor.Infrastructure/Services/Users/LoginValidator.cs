@@ -6,9 +6,9 @@ using Microsoft.Extensions.DependencyInjection;
 namespace DiagramEditor.Infrastructure.Services.Users;
 
 [Injectable(ServiceLifetime.Singleton)]
-internal sealed partial class BasicLoginValidator : ApplicationValidator<string>, ILoginValidator
+internal sealed class LoginValidator : ApplicationValidator<string>, ILoginValidator
 {
-    public BasicLoginValidator()
+    public LoginValidator()
     {
         RuleFor(login => login)
             .MinimumLength(3)
