@@ -11,4 +11,8 @@ public sealed class DiagramEnvironment
     public required string PublicUrl { get; set; }
 
     public required string PublicName { get; set; }
+
+    public required string? BannerUrl { get; set; } = null;
+
+    public required int ViewsCount { get; set; } = 0;
 }

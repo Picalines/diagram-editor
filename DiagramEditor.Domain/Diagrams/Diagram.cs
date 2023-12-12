@@ -10,9 +10,9 @@ public sealed class Diagram
 
     public required string Name { get; set; }
 
+    public required string Description { get; set; } = "";
+
     public DateTime CreatedDate { get; set; } = DateTime.UtcNow;
 
     public DateTime UpdatedDate { get; set; } = DateTime.UtcNow;
-
-    public int ViewsCount { get; set; } = 0;
 }
