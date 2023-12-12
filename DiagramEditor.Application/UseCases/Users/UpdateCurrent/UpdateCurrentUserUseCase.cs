@@ -57,7 +57,9 @@ internal sealed class UpdateCurrentUserUseCase(
                     Login = request.Login,
                     Password = request.Password,
                     DisplayName = request.DisplayName,
-                    AvatarUrl = request.AvatarUrl,
+                    AvatarUrl = request
+                        .AvatarUrl
+                        .Map(avatarUrl => Maybe.From(avatarUrl).Where(_ => avatarUrl is not "")),
                 };
 
                 return users

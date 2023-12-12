@@ -21,7 +21,7 @@ public sealed record UpdateUserDto
 
     public Maybe<string> DisplayName { get; init; }
 
-    public Maybe<string> AvatarUrl { get; init; }
+    public Maybe<Maybe<string>> AvatarUrl { get; init; }
 }
 
 public interface IUserRepository

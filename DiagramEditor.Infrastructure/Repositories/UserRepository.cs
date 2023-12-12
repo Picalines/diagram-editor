@@ -50,7 +50,7 @@ internal sealed class UserRepository(ApplicationContext context, IPasswordHasher
 
         updatedUser.Password.Execute(password => user.PasswordHash = passwordHasher.Hash(password));
         updatedUser.DisplayName.Execute(displayName => user.DisplayName = displayName);
-        updatedUser.AvatarUrl.Execute(avatarUrl => user.AvatarUrl = avatarUrl);
+        updatedUser.AvatarUrl.Execute(avatarUrl => user.AvatarUrl = avatarUrl.GetValueOrDefault());
 
         context.SaveChanges();
 
