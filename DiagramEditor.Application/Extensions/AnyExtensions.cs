@@ -1,6 +1,6 @@
 namespace DiagramEditor.Application.Extensions;
 
-public static class NullableExtensions
+public static class AnyExtensions
 {
     public static void IfNotNull<T>(this T? nullable, Action action)
     {

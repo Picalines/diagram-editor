@@ -17,9 +17,9 @@ public interface IDiagramRepository
 
     public IEnumerable<Diagram> GetCreatedByUser(User user);
 
-    public Maybe<Diagram> Create(User creator, string name);
+    public Diagram Create(User creator, string name);
 
-    public Maybe<Diagram> Update(Diagram diagram, DiagramUpdateDto updatedDiagram);
+    public Diagram Update(Diagram diagram, DiagramUpdateDto updatedDiagram);
 
     public bool DeleteById(Guid id);
 }
