@@ -2,7 +2,7 @@ using CSharpFunctionalExtensions;
 
 namespace DiagramEditor.Application.UseCases.Users.UpdateCurrent;
 
-public sealed record UpdateCurrentUserRequest : IRequest
+public sealed record UpdateCurrentUserRequest
 {
     public Maybe<string> Login { get; init; }
 

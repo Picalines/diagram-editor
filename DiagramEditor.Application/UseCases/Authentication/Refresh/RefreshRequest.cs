@@ -1,6 +1,6 @@
 namespace DiagramEditor.Application.UseCases.Authentication.Refresh;
 
-public sealed record RefreshRequest : IRequest
+public sealed record RefreshRequest
 {
     public required string AccessToken { get; init; }
 

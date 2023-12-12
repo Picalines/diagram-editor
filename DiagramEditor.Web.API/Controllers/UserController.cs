@@ -1,6 +1,6 @@
 using System.ComponentModel.DataAnnotations;
+using DiagramEditor.Application;
 using DiagramEditor.Application.Errors;
-using DiagramEditor.Application.UseCases;
 using DiagramEditor.Application.UseCases.Users.GetCurrent;
 using DiagramEditor.Application.UseCases.Users.Register;
 using DiagramEditor.Application.UseCases.Users.UpdateCurrent;

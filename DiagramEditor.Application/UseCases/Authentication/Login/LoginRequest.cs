@@ -1,6 +1,6 @@
 namespace DiagramEditor.Application.UseCases.Authentication.Login;
 
-public sealed record LoginRequest : IRequest
+public sealed record LoginRequest
 {
     public required string Login { get; init; }
 
