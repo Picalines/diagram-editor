@@ -22,52 +22,41 @@ internal sealed class UpdateCurrentUserUseCase(
         UpdateCurrentUserRequest request
     )
     {
-        if (
-            request.Login.TryGetValue(out var login)
-            && loginValidator.Validate(login, out var loginErrors) is false
-        )
-        {
-            return Result
-                .Failure<UpdateCurrentUserResponse, UpdateCurrentUserError>(
-                    UpdateCurrentUserError.ValidationError
-                )
-                .MapError(error => EnumError.From(error, loginErrors))
-                .ToCompletedTask();
-        }
+        return request
+            .Login
+            .Bind(loginValidator.Validate)
+            .Bind(_ => request.Password.Bind(passwordValidator.Validate))
+            .ToFailure()
+            .MapError(
+                validationError =>
+                    EnumError.From(UpdateCurrentUserError.ValidationError, validationError.Messages)
+            )
+            .Bind(
+                _ =>
+                    auth.GetAuthenticatedUser()
+                        .ToResult(UpdateCurrentUserError.Unauthorized)
+                        .Bind(user =>
+                        {
+                            var updatedUser = new UpdateUserDto()
+                            {
+                                Login = request.Login,
+                                Password = request.Password,
+                                DisplayName = request.DisplayName,
+                                AvatarUrl = request
+                                    .AvatarUrl
+                                    .Map(
+                                        avatarUrl =>
+                                            Maybe.From(avatarUrl).Where(_ => avatarUrl is not "")
+                                    ),
+                            };
 
-        if (
-            request.Password.TryGetValue(out var password)
-            && passwordValidator.Validate(password, out var passwordErrors) is false
-        )
-        {
-            return Result
-                .Failure<UpdateCurrentUserResponse, UpdateCurrentUserError>(
-                    UpdateCurrentUserError.ValidationError
-                )
-                .MapError(error => EnumError.From(error, passwordErrors))
-                .ToCompletedTask();
-        }
-
-        return auth.GetAuthenticatedUser()
-            .ToResult(UpdateCurrentUserError.Unauthorized)
-            .Bind(user =>
-            {
-                var updatedUser = new UpdateUserDto()
-                {
-                    Login = request.Login,
-                    Password = request.Password,
-                    DisplayName = request.DisplayName,
-                    AvatarUrl = request
-                        .AvatarUrl
-                        .Map(avatarUrl => Maybe.From(avatarUrl).Where(_ => avatarUrl is not "")),
-                };
-
-                return users
-                    .Update(user, updatedUser)
-                    .Map(user => new UpdateCurrentUserResponse(user))
-                    .MapError(error => error.CastTo<UpdateCurrentUserError>());
-            })
-            .MapError(EnumError.From)
+                            return users
+                                .Update(user, updatedUser)
+                                .Map(user => new UpdateCurrentUserResponse(user))
+                                .MapError(error => error.CastTo<UpdateCurrentUserError>());
+                        })
+                        .MapError(EnumError.From)
+            )
             .ToCompletedTask();
     }
 }
