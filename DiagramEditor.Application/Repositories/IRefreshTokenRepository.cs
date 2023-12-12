@@ -1,5 +1,4 @@
 ﻿using CSharpFunctionalExtensions;
-using DiagramEditor.Domain.Users;
 
 namespace DiagramEditor.Application;
 
