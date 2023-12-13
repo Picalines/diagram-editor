@@ -40,6 +40,8 @@ internal sealed class DiagramRepository(ApplicationContext context) : IDiagramRe
         updatedDiagram.Name.Execute(name => diagram.Name = name);
         updatedDiagram.Description.Execute(description => diagram.Description = description);
 
+        diagram.UpdatedDate = DateTime.UtcNow;
+
         context.SaveChanges();
 
         return diagram;

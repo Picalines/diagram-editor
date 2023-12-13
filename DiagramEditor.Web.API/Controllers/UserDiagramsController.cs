@@ -1,9 +1,13 @@
 using System.ComponentModel.DataAnnotations;
+using CSharpFunctionalExtensions;
 using DiagramEditor.Application;
+using DiagramEditor.Application.Errors;
 using DiagramEditor.Application.UseCases.Diagrams.Create;
 using DiagramEditor.Application.UseCases.Diagrams.Delete;
 using DiagramEditor.Application.UseCases.Diagrams.GetInfo;
 using DiagramEditor.Application.UseCases.Diagrams.GetOwned;
+using DiagramEditor.Application.UseCases.Diagrams.UpdateInfo;
+using DiagramEditor.Web.API.Controllers.Requests;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
@@ -16,6 +20,7 @@ public sealed class UserDiagramsController(
     IGetOwnedDiagramsUseCase getOwnedUseCase,
     ICreateDiagramUseCase createUseCase,
     IGetDiagramInfoUseCase getUseCase,
+    IUpdateDiagramInfoUseCase updateUseCase,
     IDeleteDiagramUseCase deleteUseCase
 ) : ControllerBase
 {
@@ -56,8 +61,8 @@ public sealed class UserDiagramsController(
     [HttpGet("{id}")]
     public async Task<
         Results<Ok<GetDiagramInfoResponse>, BadRequest, NotFound, UnauthorizedHttpResult>
-    > GetDiagramById([FromQuery, Required] Guid diagramId) =>
-        await getUseCase.Execute(new GetDiagramInfoRequest(diagramId)) switch
+    > GetDiagramById([FromQuery, Required] Guid id) =>
+        await getUseCase.Execute(new GetDiagramInfoRequest(id)) switch
         {
             { IsSuccess: true, Value: var response } => TypedResults.Ok(response),
             { Error.Error: var error }
@@ -70,11 +75,45 @@ public sealed class UserDiagramsController(
         };
 
     [Authorize]
+    [HttpPut("{id}")]
+    public async Task<
+        Results<
+            Ok<UpdateDiagramInfoResponse>,
+            BadRequest<EnumError<UpdateDiagramInfoError>?>,
+            NotFound,
+            UnauthorizedHttpResult
+        >
+    > UpdateDiagramById(
+        [FromBody, Required] UpdateDiagramInfoRequestBody requestBody,
+        [FromQuery, Required] Guid id
+    ) =>
+        await updateUseCase.Execute(
+            new UpdateDiagramInfoRequest
+            {
+                Id = id,
+                Name = requestBody.Name.AsMaybe(),
+                Description = requestBody.Description.AsMaybe()
+            }
+        ) switch
+        {
+            { IsSuccess: true, Value: var response } => TypedResults.Ok(response),
+            { Error: var error }
+                => error.Error switch
+                {
+                    UpdateDiagramInfoError.Unauthorized => TypedResults.Unauthorized(),
+                    UpdateDiagramInfoError.ValidationError
+                        => TypedResults.BadRequest<EnumError<UpdateDiagramInfoError>?>(error),
+                    UpdateDiagramInfoError.NotFound => TypedResults.NotFound(),
+                    _ => throw new NotImplementedException(),
+                },
+        };
+
+    [Authorize]
     [HttpDelete("{id}")]
     public async Task<Results<Ok, BadRequest, NotFound, UnauthorizedHttpResult>> DeleteDiagram(
-        [FromQuery, Required] Guid diagramId
+        [FromQuery, Required] Guid id
     ) =>
-        await deleteUseCase.Execute(new DeleteDiagramRequest { Id = diagramId }) switch
+        await deleteUseCase.Execute(new DeleteDiagramRequest { Id = id }) switch
         {
             { IsSuccess: true } => TypedResults.Ok(),
             { Error.Error: var error }
