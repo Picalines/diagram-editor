@@ -1,7 +1,9 @@
 using System.ComponentModel.DataAnnotations;
+using DiagramEditor.Application;
 using DiagramEditor.Application.UseCases.Diagrams.Create;
 using DiagramEditor.Application.UseCases.Diagrams.Delete;
 using DiagramEditor.Application.UseCases.Diagrams.GetInfo;
+using DiagramEditor.Application.UseCases.Diagrams.GetOwned;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
@@ -11,11 +13,28 @@ namespace DiagramEditor.Web.API.Controllers;
 [ApiController]
 [Route("user/diagrams")]
 public sealed class UserDiagramsController(
+    IGetOwnedDiagramsUseCase getOwnedUseCase,
     ICreateDiagramUseCase createUseCase,
     IGetDiagramInfoUseCase getUseCase,
     IDeleteDiagramUseCase deleteUseCase
 ) : ControllerBase
 {
+    [Authorize]
+    [HttpGet]
+    public async Task<
+        Results<Ok<GetOwnedDiagramsResponse>, UnauthorizedHttpResult>
+    > GetOwnedDiagrams() =>
+        await getOwnedUseCase.Execute(Unit.Instance) switch
+        {
+            { IsSuccess: true, Value: var response } => TypedResults.Ok(response),
+            { Error.Error: var error }
+                => error switch
+                {
+                    GetOwnedDiagramsError.Unauthorized => TypedResults.Unauthorized(),
+                    _ => throw new NotImplementedException(),
+                }
+        };
+
     [Authorize]
     [HttpPost]
     public async Task<
