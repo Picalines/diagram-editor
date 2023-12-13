@@ -2,7 +2,6 @@ using System.ComponentModel.DataAnnotations;
 using DiagramEditor.Application;
 using DiagramEditor.Application.Errors;
 using DiagramEditor.Application.UseCases.Users.GetCurrent;
-using DiagramEditor.Application.UseCases.Users.Register;
 using DiagramEditor.Application.UseCases.Users.UpdateCurrent;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http.HttpResults;
@@ -12,10 +11,9 @@ namespace DiagramEditor.Web.API.Controllers;
 
 [ApiController]
 [Route("user")]
-public sealed class UserController(
+public sealed class CurrentUserController(
     IGetCurrentUserUseCase getCurrentUseCase,
-    IUpdateCurrentUserUseCase updateCurrentUseCase,
-    IRegisterUseCase registerUseCase
+    IUpdateCurrentUserUseCase updateCurrentUseCase
 ) : ControllerBase
 {
     [Authorize]
@@ -59,31 +57,6 @@ public sealed class UserController(
                     UpdateCurrentUserError.ValidationError
                     or UpdateCurrentUserError.LoginTaken
                         => TypedResults.BadRequest<EnumError<UpdateCurrentUserError>?>(error),
-                    _ => throw new NotImplementedException(),
-                },
-        };
-    }
-
-    [AllowAnonymous]
-    [HttpPost]
-    public async Task<
-        Results<Ok<RegisterResponse>, BadRequest<EnumError<RegisterError>?>>
-    > Register([FromBody, Required] RegisterRequest request)
-    {
-        if (ModelState is { IsValid: false })
-        {
-            return TypedResults.BadRequest<EnumError<RegisterError>?>(null);
-        }
-
-        return await registerUseCase.Execute(request) switch
-        {
-            { IsSuccess: true, Value: var response } => TypedResults.Ok(response),
-            { Error: var error }
-                => error.Error switch
-                {
-                    RegisterError.ValidationError
-                    or RegisterError.LoginTaken
-                        => TypedResults.BadRequest<EnumError<RegisterError>?>(error),
                     _ => throw new NotImplementedException(),
                 },
         };
