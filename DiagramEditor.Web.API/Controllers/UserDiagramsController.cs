@@ -1,6 +1,7 @@
 using System.ComponentModel.DataAnnotations;
 using DiagramEditor.Application.UseCases.Diagrams.Create;
 using DiagramEditor.Application.UseCases.Diagrams.Delete;
+using DiagramEditor.Application.UseCases.Diagrams.GetInfo;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
@@ -11,6 +12,7 @@ namespace DiagramEditor.Web.API.Controllers;
 [Route("user/diagrams")]
 public sealed class UserDiagramsController(
     ICreateDiagramUseCase createUseCase,
+    IGetDiagramInfoUseCase getUseCase,
     IDeleteDiagramUseCase deleteUseCase
 ) : ControllerBase
 {
@@ -35,6 +37,30 @@ public sealed class UserDiagramsController(
                     CreateDiagramError.Unauthorized => TypedResults.Unauthorized(),
                     _ => throw new NotImplementedException(),
                 }
+        };
+    }
+
+    [Authorize]
+    [HttpGet("{id}")]
+    public async Task<
+        Results<Ok<GetDiagramInfoResponse>, BadRequest, NotFound, UnauthorizedHttpResult>
+    > GetDiagramById([FromQuery, Required] Guid diagramId)
+    {
+        if (ModelState is { IsValid: false })
+        {
+            return TypedResults.BadRequest();
+        }
+
+        return await getUseCase.Execute(new GetDiagramInfoRequest(diagramId)) switch
+        {
+            { IsSuccess: true, Value: var response } => TypedResults.Ok(response),
+            { Error.Error: var error }
+                => error switch
+                {
+                    GetDiagramInfoError.Unauthorized => TypedResults.Unauthorized(),
+                    GetDiagramInfoError.NotFound => TypedResults.NotFound(),
+                    _ => throw new NotImplementedException(),
+                },
         };
     }
 
