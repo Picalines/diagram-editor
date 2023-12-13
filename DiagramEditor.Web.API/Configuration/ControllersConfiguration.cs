@@ -1,12 +1,18 @@
 using System.Text.Json.Serialization;
 using System.Text.Json.Serialization.Metadata;
+using DiagramEditor.Web.API.Filters;
 
 namespace DiagramEditor.Web.API.Configuration;
 
-internal static class JsonConfiguration
+internal static class ControllersConfiguration
 {
-    public static IMvcBuilder AddJsonOptions(this IMvcBuilder mvcBuilder)
+    public static IServiceCollection AddConfiguredControllers(this IServiceCollection services)
     {
+        var mvcBuilder = services.AddControllers(options =>
+        {
+            options.Filters.Add<ModelStateActionFilter>();
+        });
+
         mvcBuilder.AddJsonOptions(options =>
         {
             options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
@@ -18,6 +24,6 @@ internal static class JsonConfiguration
             };
         });
 
-        return mvcBuilder;
+        return services;
     }
 }

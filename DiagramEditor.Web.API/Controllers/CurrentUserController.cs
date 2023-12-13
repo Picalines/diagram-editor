@@ -18,9 +18,8 @@ public sealed class CurrentUserController(
 {
     [Authorize]
     [HttpGet]
-    public async Task<Results<Ok<CurrentUserResponse>, UnauthorizedHttpResult>> GetCurrentUser()
-    {
-        return await getCurrentUseCase.Execute(Unit.Instance) switch
+    public async Task<Results<Ok<CurrentUserResponse>, UnauthorizedHttpResult>> GetCurrentUser() =>
+        await getCurrentUseCase.Execute(Unit.Instance) switch
         {
             { IsSuccess: true, Value: var response } => TypedResults.Ok(response),
             { Error.Error: var error }
@@ -30,7 +29,6 @@ public sealed class CurrentUserController(
                     _ => throw new NotImplementedException(),
                 },
         };
-    }
 
     [Authorize]
     [HttpPut]
@@ -40,14 +38,8 @@ public sealed class CurrentUserController(
             BadRequest<EnumError<UpdateCurrentUserError>?>,
             UnauthorizedHttpResult
         >
-    > EditCurrentUser([FromBody, Required] UpdateCurrentUserRequest request)
-    {
-        if (ModelState is { IsValid: false })
-        {
-            return TypedResults.BadRequest<EnumError<UpdateCurrentUserError>?>(null);
-        }
-
-        return await updateCurrentUseCase.Execute(request) switch
+    > EditCurrentUser([FromBody, Required] UpdateCurrentUserRequest request) =>
+        await updateCurrentUseCase.Execute(request) switch
         {
             { IsSuccess: true, Value: var response } => TypedResults.Ok(response),
             { Error: var error }
@@ -60,5 +52,4 @@ public sealed class CurrentUserController(
                     _ => throw new NotImplementedException(),
                 },
         };
-    }
 }

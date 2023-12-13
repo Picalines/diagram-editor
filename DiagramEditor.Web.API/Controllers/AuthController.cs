@@ -21,14 +21,8 @@ public sealed class AuthController(
     [HttpPost("login")]
     public async Task<Results<Ok<LoginResponse>, BadRequest, UnauthorizedHttpResult>> Login(
         [FromBody, Required] LoginRequest request
-    )
-    {
-        if (ModelState is { IsValid: false })
-        {
-            return TypedResults.BadRequest();
-        }
-
-        return await loginUseCase.Execute(request) switch
+    ) =>
+        await loginUseCase.Execute(request) switch
         {
             { IsSuccess: true, Value: var response } => TypedResults.Ok(response),
             { Error.Error: var error }
@@ -38,20 +32,13 @@ public sealed class AuthController(
                     _ => throw new NotImplementedException(),
                 },
         };
-    }
 
     [AllowAnonymous]
     [HttpPost("refresh")]
     public async Task<Results<Ok<RefreshResponse>, BadRequest, ForbidHttpResult>> Refresh(
         [FromBody, Required] RefreshRequest request
-    )
-    {
-        if (ModelState is { IsValid: false })
-        {
-            return TypedResults.BadRequest();
-        }
-
-        return await refreshUseCase.Execute(request) switch
+    ) =>
+        await refreshUseCase.Execute(request) switch
         {
             { IsSuccess: true, Value: var response } => TypedResults.Ok(response),
             { Error.Error: var error }
@@ -62,18 +49,11 @@ public sealed class AuthController(
                     _ => throw new NotImplementedException(),
                 },
         };
-    }
 
     [Authorize]
     [HttpPost("logout")]
-    public async Task<Results<Ok, BadRequest, UnauthorizedHttpResult>> Logout()
-    {
-        if (ModelState is { IsValid: false })
-        {
-            return TypedResults.BadRequest();
-        }
-
-        return await logoutUseCase.Execute(Unit.Instance) switch
+    public async Task<Results<Ok, BadRequest, UnauthorizedHttpResult>> Logout() =>
+        await logoutUseCase.Execute(Unit.Instance) switch
         {
             { IsSuccess: true } => TypedResults.Ok(),
             { Error.Error: var error }
@@ -83,5 +63,4 @@ public sealed class AuthController(
                     _ => throw new NotImplementedException(),
                 },
         };
-    }
 }

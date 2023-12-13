@@ -20,14 +20,8 @@ public sealed class UserDiagramsController(
     [HttpPost]
     public async Task<
         Results<Ok<CreateDiagramResponse>, BadRequest, UnauthorizedHttpResult>
-    > CreateDiagram([FromBody, Required] CreateDiagramRequest request)
-    {
-        if (ModelState is { IsValid: false })
-        {
-            return TypedResults.BadRequest();
-        }
-
-        return await createUseCase.Execute(request) switch
+    > CreateDiagram([FromBody, Required] CreateDiagramRequest request) =>
+        await createUseCase.Execute(request) switch
         {
             { IsSuccess: true, Value: var response } => TypedResults.Ok(response),
             { Error.Error: var error }
@@ -38,20 +32,13 @@ public sealed class UserDiagramsController(
                     _ => throw new NotImplementedException(),
                 }
         };
-    }
 
     [Authorize]
     [HttpGet("{id}")]
     public async Task<
         Results<Ok<GetDiagramInfoResponse>, BadRequest, NotFound, UnauthorizedHttpResult>
-    > GetDiagramById([FromQuery, Required] Guid diagramId)
-    {
-        if (ModelState is { IsValid: false })
-        {
-            return TypedResults.BadRequest();
-        }
-
-        return await getUseCase.Execute(new GetDiagramInfoRequest(diagramId)) switch
+    > GetDiagramById([FromQuery, Required] Guid diagramId) =>
+        await getUseCase.Execute(new GetDiagramInfoRequest(diagramId)) switch
         {
             { IsSuccess: true, Value: var response } => TypedResults.Ok(response),
             { Error.Error: var error }
@@ -62,20 +49,13 @@ public sealed class UserDiagramsController(
                     _ => throw new NotImplementedException(),
                 },
         };
-    }
 
     [Authorize]
     [HttpDelete("{id}")]
     public async Task<Results<Ok, BadRequest, NotFound, UnauthorizedHttpResult>> DeleteDiagram(
         [FromQuery, Required] Guid diagramId
-    )
-    {
-        if (ModelState is { IsValid: false })
-        {
-            return TypedResults.BadRequest();
-        }
-
-        return await deleteUseCase.Execute(new DeleteDiagramRequest { Id = diagramId }) switch
+    ) =>
+        await deleteUseCase.Execute(new DeleteDiagramRequest { Id = diagramId }) switch
         {
             { IsSuccess: true } => TypedResults.Ok(),
             { Error.Error: var error }
@@ -86,5 +66,4 @@ public sealed class UserDiagramsController(
                     _ => throw new NotImplementedException(),
                 }
         };
-    }
 }

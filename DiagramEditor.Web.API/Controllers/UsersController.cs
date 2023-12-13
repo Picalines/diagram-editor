@@ -15,14 +15,8 @@ public sealed class UsersController(IRegisterUseCase registerUseCase) : Controll
     [HttpPost]
     public async Task<
         Results<Ok<RegisterResponse>, BadRequest<EnumError<RegisterError>?>>
-    > Register([FromBody, Required] RegisterRequest request)
-    {
-        if (ModelState is { IsValid: false })
-        {
-            return TypedResults.BadRequest<EnumError<RegisterError>?>(null);
-        }
-
-        return await registerUseCase.Execute(request) switch
+    > Register([FromBody, Required] RegisterRequest request) =>
+        await registerUseCase.Execute(request) switch
         {
             { IsSuccess: true, Value: var response } => TypedResults.Ok(response),
             { Error: var error }
@@ -34,5 +28,4 @@ public sealed class UsersController(IRegisterUseCase registerUseCase) : Controll
                     _ => throw new NotImplementedException(),
                 },
         };
-    }
 }

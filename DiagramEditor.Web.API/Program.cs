@@ -7,16 +7,13 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Configuration.AddJsonFile("appsettings.Secret.json");
 builder.Configuration.AddEnvironmentVariables();
 
-builder.Services.AddHttpContextAccessor();
-
-builder.Services.AddControllers().AddJsonOptions();
-
-builder.Services.AddApplication().AddInfrastructure(builder.Configuration);
-
-builder.Services.AddSwagger();
-
 builder
     .Services
+    .AddHttpContextAccessor()
+    .AddApplication()
+    .AddInfrastructure(builder.Configuration)
+    .AddConfiguredControllers()
+    .AddSwagger()
     .AddCors(
         options =>
             options.AddPolicy(
