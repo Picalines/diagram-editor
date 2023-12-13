@@ -8,8 +8,8 @@ using Microsoft.AspNetCore.Mvc;
 namespace DiagramEditor.Web.API.Controllers;
 
 [ApiController]
-[Route("diagrams")]
-public sealed class DiagramController(
+[Route("user/diagrams")]
+public sealed class UserDiagramsController(
     ICreateDiagramUseCase createUseCase,
     IDeleteDiagramUseCase deleteUseCase
 ) : ControllerBase
