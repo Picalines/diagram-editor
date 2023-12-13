@@ -1,4 +1,6 @@
-﻿using System.Runtime.CompilerServices;
+﻿using System.Reflection;
+using System.Runtime.CompilerServices;
+using CSharpFunctionalExtensions;
 using DiagramEditor.Application.Extensions;
 using Microsoft.AspNetCore.Mvc.ApiExplorer;
 using Microsoft.OpenApi.Models;
@@ -25,8 +27,9 @@ internal static class SwaggerConfiguration
 
         options.SupportNonNullableReferenceTypes();
 
-        options.SchemaFilter<SwaggerRequiredSchemaFilter>();
-        options.OperationFilter<SwaggerRequestBodyMediaFilter>();
+        options.DocumentFilter<MaybeDocumentFilter>();
+        options.SchemaFilter<RequiredSchemaFilter>();
+        options.OperationFilter<RequestBodyMediaOperationFilter>();
 
         options.CustomOperationIds(GetOperationId);
 
@@ -68,35 +71,23 @@ internal static class SwaggerConfiguration
             return null;
         }
 
-        var operationId = method
-            .Name
-            .Capitalize()
-            .AddPrefix(apiDescription.HttpMethod?.ToLower().Capitalize() ?? "")
-            .Decapitalize();
-
-        if (method.DeclaringType is { Name: var controllerTypeName })
-        {
-            controllerTypeName = controllerTypeName.RemoveSuffix("Controller").Capitalize();
-
-            if (operationId.Contains(controllerTypeName) is false)
-            {
-                operationId = operationId.AddSuffix(controllerTypeName);
-            }
-        }
-
-        return operationId;
+        return method.Name.Decapitalize();
     }
 }
 
-file sealed class SwaggerRequiredSchemaFilter : ISchemaFilter
+file sealed class RequiredSchemaFilter : ISchemaFilter
 {
+    private static readonly NullabilityInfoContext _nullabilityContext = new();
+
     public void Apply(OpenApiSchema schema, SchemaFilterContext context)
     {
         var typeProperties = context.Type.GetProperties();
 
+        schema.Required = new HashSet<string>();
+
         foreach (var schemeProperty in schema.Properties)
         {
-            var typeProperty =
+            var property =
                 typeProperties.SingleOrDefault(
                     x => x.Name.ToLower() == schemeProperty.Key.ToLower()
                 )
@@ -104,15 +95,87 @@ file sealed class SwaggerRequiredSchemaFilter : ISchemaFilter
                     $"Could not find property {schemeProperty.Key} in {context.Type}, or several names conflict"
                 );
 
-            if (typeProperty.IsDefined(typeof(RequiredMemberAttribute), false))
+            var propertyType = property.PropertyType;
+
+            var isMaybeProperty =
+                propertyType.IsGenericType
+                && propertyType.GetGenericTypeDefinition() == typeof(Maybe<>);
+
+            var isNullable = IsMarkedAsNullable(property);
+
+            if (!isMaybeProperty && !isNullable)
             {
                 schema.Required.Add(schemeProperty.Key);
             }
         }
     }
+
+    private static bool IsMarkedAsNullable(PropertyInfo property)
+    {
+        return _nullabilityContext.Create(property).WriteState is NullabilityState.Nullable;
+    }
 }
 
-file sealed class SwaggerRequestBodyMediaFilter : IOperationFilter
+file sealed class MaybeDocumentFilter : IDocumentFilter
+{
+    public void Apply(OpenApiDocument document, DocumentFilterContext context)
+    {
+        foreach (var schema in document.Components.Schemas)
+        {
+            FlattenMaybeProperties(schema.Value, context);
+        }
+
+        RemoveMaybeSchemas(document);
+    }
+
+    private void FlattenMaybeProperties(OpenApiSchema schema, DocumentFilterContext context)
+    {
+        foreach (var (key, value) in schema.Properties)
+        {
+            if (value.Reference is not { Id: var referenceId })
+            {
+                continue;
+            }
+
+            if (!IsReferenceToMaybe(referenceId, context.SchemaRepository))
+            {
+                continue;
+            }
+
+            var maybeSchema = context.SchemaRepository.Schemas[referenceId];
+
+            if (!maybeSchema.Properties.TryGetValue("value", out var valueSchema))
+            {
+                throw new InvalidOperationException("Maybe schema must have a value property.");
+            }
+
+            schema.Properties[key] = valueSchema;
+        }
+    }
+
+    private static bool IsReferenceToMaybe(string referenceId, SchemaRepository schemaRepository)
+    {
+        return IsMaybeSchema(schemaRepository.Schemas.First(x => x.Key == referenceId));
+    }
+
+    private static bool IsMaybeSchema(KeyValuePair<string, OpenApiSchema> referencedSchema)
+    {
+        return referencedSchema is { Key: var key, Value.Properties: var properties }
+            && key.EndsWith("Maybe")
+            && properties.Keys.ToArray() is ["value", "hasValue", "hasNoValue"];
+    }
+
+    private void RemoveMaybeSchemas(OpenApiDocument swaggerDoc)
+    {
+        swaggerDoc
+            .Components
+            .Schemas
+            .Where(IsMaybeSchema)
+            .ForEach(swaggerDoc.Components.Schemas.Remove);
+    }
+}
+
+file sealed class RequestBodyMediaOperationFilter : IOperationFilter
 {
     public void Apply(OpenApiOperation operation, OperationFilterContext context)
     {
