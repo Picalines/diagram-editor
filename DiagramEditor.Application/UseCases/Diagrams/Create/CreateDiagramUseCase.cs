@@ -1,5 +1,6 @@
 using CSharpFunctionalExtensions;
 using DiagramEditor.Application.Attributes;
+using DiagramEditor.Application.DTOs;
 using DiagramEditor.Application.Errors;
 using DiagramEditor.Application.Extensions;
 using DiagramEditor.Application.Repositories;
@@ -43,7 +44,8 @@ internal sealed class CreateDiagramUseCase(
                                 }
                         )
                         .Tap(diagrams.Add)
-                        .Map(diagram => new CreateDiagramResponse(diagram))
+                        .Map(DiagramDTO.FromDiagram)
+                        .Map(diagramDto => new CreateDiagramResponse(diagramDto))
             )
             .ToCompletedTask();
     }

@@ -1,5 +1,6 @@
 using CSharpFunctionalExtensions;
 using DiagramEditor.Application.Attributes;
+using DiagramEditor.Application.DTOs;
 using DiagramEditor.Application.Errors;
 using DiagramEditor.Application.Extensions;
 using DiagramEditor.Application.Repositories;
@@ -24,7 +25,8 @@ internal sealed class GetDiagramInfoUseCase(IDiagramRepository diagrams, IAuthen
                         .GetById(request.Id)
                         .Where(diagram => diagram.Creator.Id == request.Id)
                         .ToResult(GetDiagramInfoError.NotFound)
-                        .Map(diagram => new GetDiagramInfoResponse(diagram))
+                        .Map(DiagramDTO.FromDiagram)
+                        .Map(diagramDto => new GetDiagramInfoResponse(diagramDto))
             )
             .MapError(EnumError.From)
             .ToCompletedTask();

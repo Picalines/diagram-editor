@@ -1,5 +1,6 @@
 using CSharpFunctionalExtensions;
 using DiagramEditor.Application.Attributes;
+using DiagramEditor.Application.DTOs;
 using DiagramEditor.Application.Errors;
 using DiagramEditor.Application.Extensions;
 using DiagramEditor.Application.Repositories;
@@ -46,7 +47,8 @@ internal sealed class UpdateDiagramInfoUseCase(
                             diagram.UpdatedDate = DateTime.UtcNow;
                         })
                         .Tap(diagrams.Update)
-                        .Map(diagram => new UpdateDiagramInfoResponse(diagram))
+                        .Map(DiagramDTO.FromDiagram)
+                        .Map(diagramDto => new UpdateDiagramInfoResponse(diagramDto))
                         .MapError(EnumError.From)
             )
             .ToCompletedTask();

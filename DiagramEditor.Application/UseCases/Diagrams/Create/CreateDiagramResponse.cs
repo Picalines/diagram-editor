@@ -1,5 +1,5 @@
-using DiagramEditor.Domain.Diagrams;
+using DiagramEditor.Application.DTOs;
 
 namespace DiagramEditor.Application.UseCases.Diagrams.Create;
 
-public sealed record CreateDiagramResponse(Diagram Diagram);
+public sealed record CreateDiagramResponse(DiagramDTO Diagram);
