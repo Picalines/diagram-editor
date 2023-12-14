@@ -18,7 +18,7 @@ public sealed class DiagramElementsController(
     [HttpGet]
     public async Task<
         Results<Ok<GetAllDiagramElementsResponse>, BadRequest, NotFound, UnauthorizedHttpResult>
-    > GetAllDiagramElements([FromQuery, Required] Guid diagramId) =>
+    > GetAllUserDiagramElements([FromQuery, Required] Guid diagramId) =>
         await getAllUseCase.Execute(
             new GetAllDiagramElementsRequest { Id = diagramId, ViewMode = DiagramViewMode.InEditor }
         ) switch
