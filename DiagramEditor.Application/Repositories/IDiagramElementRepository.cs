@@ -14,5 +14,6 @@ public interface IDiagramElementRepository
     public void Update(DiagramElement element);
 
     public void Remove(DiagramElement element);
-}
 
+    public void RemoveAllByDiagram(Diagram diagram);
+}

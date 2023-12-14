@@ -37,4 +37,11 @@ internal sealed class DiagramElementRepository(ApplicationContext context)
         context.DiagramElements.Remove(element);
         context.SaveChanges();
     }
+
+    public void RemoveAllByDiagram(Diagram diagram)
+    {
+        // TODO: bulk delete
+        context.DiagramElements.RemoveRange(GetAllByDiagram(diagram));
+        context.SaveChanges();
+    }
 }

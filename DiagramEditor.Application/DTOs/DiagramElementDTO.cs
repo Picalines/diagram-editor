@@ -1,3 +1,4 @@
+using DiagramEditor.Application.Repositories;
 using DiagramEditor.Domain.Diagrams;
 
 namespace DiagramEditor.Application.DTOs;
@@ -14,7 +15,12 @@ public sealed record DiagramElementDTO
 
     public required float OriginY { get; init; }
 
-    public static DiagramElementDTO FromElement(DiagramElement element) =>
+    public required IReadOnlyDictionary<string, string> Properties { get; init; }
+
+    public static DiagramElementDTO Create(
+        DiagramElement element,
+        IReadOnlyDictionary<string, string> properties
+    ) =>
         new DiagramElementDTO
         {
             Id = element.Id,
@@ -22,5 +28,12 @@ public sealed record DiagramElementDTO
             Type = element.Type,
             OriginX = element.OriginX,
             OriginY = element.OriginY,
+            Properties = properties,
         };
+
+    public static DiagramElementDTO Create(
+        DiagramElement element,
+        IDiagramElementPropertyRepository properties
+    ) =>
+        Create(element, properties.GetAllByElement(element).ToDictionary(e => e.Key, e => e.Value));
 }

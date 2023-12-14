@@ -17,4 +17,9 @@ public static class AnyExtensions
             action.Invoke(value);
         }
     }
+
+    public static IEnumerable<T> Yield<T>(this T value)
+    {
+        yield return value;
+    }
 }

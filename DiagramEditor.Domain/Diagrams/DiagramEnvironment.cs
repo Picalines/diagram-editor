@@ -1,6 +1,4 @@
-﻿using DiagramEditor.Domain.Diagrams;
-
-namespace DiagramEditor.Domain;
+﻿namespace DiagramEditor.Domain.Diagrams;
 
 public sealed class DiagramEnvironment
 {
@@ -8,11 +6,7 @@ public sealed class DiagramEnvironment
 
     public required Diagram Diagram { get; init; }
 
-    public required string PublicUrl { get; set; }
+    public required bool IsActive { get; set; }
 
-    public required string PublicName { get; set; }
-
-    public required string? BannerUrl { get; set; } = null;
-
-    public required int ViewsCount { get; set; } = 0;
+    public required int ViewsCount { get; set; }
 }

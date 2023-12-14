@@ -14,6 +14,7 @@ namespace DiagramEditor.Application.UseCases.Diagrams.Elements.Create;
 internal sealed class CreateDiagramElementUseCase(
     IDiagramRepository diagrams,
     IDiagramElementRepository elements,
+    IDiagramElementPropertyRepository properties,
     IAuthenticator auth
 ) : ICreateDiagramElementUseCase
 {
@@ -40,7 +41,7 @@ internal sealed class CreateDiagramElementUseCase(
                                 }
                         )
                         .Tap(elements.Add)
-                        .Map(DiagramElementDTO.FromElement)
+                        .Map(element => DiagramElementDTO.Create(element, properties))
                         .Map(elementDto => new CreateDiagramElementResponse(elementDto))
             )
             .MapError(EnumError.From)

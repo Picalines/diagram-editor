@@ -16,6 +16,10 @@ public sealed class ApplicationContext : DbContext
 
     public DbSet<DiagramElement> DiagramElements { get; set; } = null!;
 
+    public DbSet<DiagramElementProperty> DiagramElementProperties { get; set; } = null!;
+
+    public DbSet<DiagramEnvironment> DiagramEnvironments { get; set; } = null!;
+
     private static MySqlConfigurationSection _mySqlConfiguration = null!;
 
     public ApplicationContext(MySqlConfigurationSection mySqlConfiguration)
