@@ -10,19 +10,10 @@ namespace DiagramEditor.Infrastructure;
 [Injectable(ServiceLifetime.Singleton)]
 internal sealed class DiagramRepository(ApplicationContext context) : IDiagramRepository
 {
-    public Diagram Create(User creator, string name)
+    public void Add(Diagram diagram)
     {
-        var diagram = new Diagram
-        {
-            Creator = creator,
-            Name = name,
-            Description = ""
-        };
-
         context.Diagrams.Add(diagram);
         context.SaveChanges();
-
-        return diagram;
     }
 
     public Maybe<Diagram> GetById(Guid id)
@@ -35,20 +26,15 @@ internal sealed class DiagramRepository(ApplicationContext context) : IDiagramRe
         return context.Diagrams.Where(diagram => diagram.Creator.Id == user.Id);
     }
 
-    public Diagram Update(Diagram diagram, DiagramUpdateDto updatedDiagram)
+    public void Update(Diagram diagram)
     {
-        updatedDiagram.Name.Execute(name => diagram.Name = name);
-        updatedDiagram.Description.Execute(description => diagram.Description = description);
-
-        diagram.UpdatedDate = DateTime.UtcNow;
-
+        context.Diagrams.Update(diagram);
         context.SaveChanges();
-
-        return diagram;
     }
 
-    public bool DeleteById(Guid id)
+    public void Remove(Diagram diagram)
     {
-        return GetById(id).Map(context.Diagrams.Remove).HasValue;
+        context.Diagrams.Remove(diagram);
+        context.SaveChanges();
     }
 }

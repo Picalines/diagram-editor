@@ -4,22 +4,15 @@ using DiagramEditor.Domain.Users;
 
 namespace DiagramEditor.Application.Repositories;
 
-public sealed record DiagramUpdateDto
-{
-    public Maybe<string> Name { get; init; }
-
-    public Maybe<string> Description { get; init; }
-}
-
 public interface IDiagramRepository
 {
+    public void Add(Diagram diagram);
+
     public Maybe<Diagram> GetById(Guid id);
 
     public IEnumerable<Diagram> GetCreatedByUser(User user);
 
-    public Diagram Create(User creator, string name);
+    public void Update(Diagram diagram);
 
-    public Diagram Update(Diagram diagram, DiagramUpdateDto updatedDiagram);
-
-    public bool DeleteById(Guid id);
+    public void Remove(Diagram diagram);
 }

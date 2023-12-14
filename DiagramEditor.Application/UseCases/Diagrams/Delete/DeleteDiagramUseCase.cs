@@ -22,12 +22,8 @@ internal sealed class DeleteDiagramUseCase(IDiagramRepository diagrams, IAuthent
                         .GetById(request.Id)
                         .Where(diagram => diagram.Creator.Id == user.Id)
                         .ToResult(DeleteDiagramError.NotFound)
-                        .Bind(
-                            _ =>
-                                diagrams
-                                    .DeleteById(request.Id)
-                                    .ToResult(DeleteDiagramError.NotFound)
-                        )
+                        .Tap(diagrams.Remove)
+                        .Map(_ => Unit.Instance)
             )
             .MapError(EnumError.From)
             .ToCompletedTask();

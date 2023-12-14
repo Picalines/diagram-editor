@@ -5,6 +5,7 @@ using DiagramEditor.Application.Extensions;
 using DiagramEditor.Application.Repositories;
 using DiagramEditor.Application.Services.Authentication;
 using DiagramEditor.Application.Services.Diagrams;
+using DiagramEditor.Domain.Diagrams;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace DiagramEditor.Application.UseCases.Diagrams.Create;
@@ -32,7 +33,17 @@ internal sealed class CreateDiagramUseCase(
                     auth.GetAuthenticatedUser()
                         .ToResult(CreateDiagramError.Unauthorized)
                         .MapError(EnumError.From)
-                        .Map(user => new CreateDiagramResponse(diagrams.Create(user, request.Name)))
+                        .Map(
+                            user =>
+                                new Diagram
+                                {
+                                    Creator = user,
+                                    Name = request.Name,
+                                    Description = request.Description.GetValueOrDefault(""),
+                                }
+                        )
+                        .Tap(diagrams.Add)
+                        .Map(diagram => new CreateDiagramResponse(diagram))
             )
             .ToCompletedTask();
     }

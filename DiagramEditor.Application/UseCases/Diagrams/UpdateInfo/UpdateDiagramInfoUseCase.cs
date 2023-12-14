@@ -39,17 +39,13 @@ internal sealed class UpdateDiagramInfoUseCase(
                                     .Where(diagram => diagram.Creator.Id == user.Id)
                                     .ToResult(UpdateDiagramInfoError.NotFound)
                         )
-                        .Map(
-                            diagram =>
-                                diagrams.Update(
-                                    diagram,
-                                    new DiagramUpdateDto
-                                    {
-                                        Name = request.Name,
-                                        Description = request.Description
-                                    }
-                                )
-                        )
+                        .Tap(diagram =>
+                        {
+                            request.Name.Execute(name => diagram.Name = name);
+                            request.Description.Execute(desc => diagram.Description = desc);
+                            diagram.UpdatedDate = DateTime.UtcNow;
+                        })
+                        .Tap(diagrams.Update)
                         .Map(diagram => new UpdateDiagramInfoResponse(diagram))
                         .MapError(EnumError.From)
             )
