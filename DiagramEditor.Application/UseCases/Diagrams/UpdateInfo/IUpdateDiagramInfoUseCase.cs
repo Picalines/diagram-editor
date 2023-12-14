@@ -8,4 +8,3 @@ public interface IUpdateDiagramInfoUseCase
         UpdateDiagramInfoResponse,
         EnumError<UpdateDiagramInfoError>
     > { }
-

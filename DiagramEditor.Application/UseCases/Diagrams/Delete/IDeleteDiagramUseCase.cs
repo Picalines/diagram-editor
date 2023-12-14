@@ -4,4 +4,3 @@ namespace DiagramEditor.Application.UseCases.Diagrams.Delete;
 
 public interface IDeleteDiagramUseCase
     : IUseCase<DeleteDiagramRequest, Unit, EnumError<DeleteDiagramError>> { }
-
