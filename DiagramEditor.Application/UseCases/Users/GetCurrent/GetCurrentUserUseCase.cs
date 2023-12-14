@@ -1,5 +1,6 @@
 using CSharpFunctionalExtensions;
 using DiagramEditor.Application.Attributes;
+using DiagramEditor.Application.DTOs;
 using DiagramEditor.Application.Errors;
 using DiagramEditor.Application.Extensions;
 using DiagramEditor.Application.Services.Authentication;
@@ -15,7 +16,8 @@ internal sealed class GetCurrentUserUseCase(IAuthenticator auth) : IGetCurrentUs
         return auth.GetAuthenticatedUser()
             .ToResult(GetCurrentUserError.Unauthorized)
             .MapError(EnumError.From)
-            .Map(user => new CurrentUserResponse(user))
+            .Map(UserDTO.FromUser)
+            .Map(userDto => new CurrentUserResponse(userDto))
             .ToCompletedTask();
     }
 }

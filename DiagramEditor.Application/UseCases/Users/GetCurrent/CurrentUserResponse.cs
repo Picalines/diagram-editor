@@ -1,5 +1,5 @@
-using DiagramEditor.Domain.Users;
+using DiagramEditor.Application.DTOs;
 
 namespace DiagramEditor.Application.UseCases.Users.GetCurrent;
 
-public sealed record CurrentUserResponse(User User);
+public sealed record CurrentUserResponse(UserDTO User);

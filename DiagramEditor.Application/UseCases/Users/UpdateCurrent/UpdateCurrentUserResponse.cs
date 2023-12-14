@@ -1,5 +1,5 @@
-using DiagramEditor.Domain.Users;
+using DiagramEditor.Application.DTOs;
 
 namespace DiagramEditor.Application.UseCases.Users.UpdateCurrent;
 
-public sealed record UpdateCurrentUserResponse(User User);
+public sealed record UpdateCurrentUserResponse(UserDTO User);

@@ -1,11 +1,13 @@
 using CSharpFunctionalExtensions;
 using DiagramEditor.Application.Attributes;
+using DiagramEditor.Application.DTOs;
 using DiagramEditor.Application.Errors;
 using DiagramEditor.Application.Extensions;
 using DiagramEditor.Application.Repositories;
 using DiagramEditor.Application.Services.Authentication;
 using DiagramEditor.Application.Services.Passwords;
 using DiagramEditor.Application.Services.Users;
+using DiagramEditor.Domain.Users;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace DiagramEditor.Application.UseCases.Users.Register;
@@ -28,21 +30,33 @@ internal sealed class RegisterUseCase(
                 validationError =>
                     EnumError.From(RegisterError.ValidationError, validationError.Messages)
             )
-            .Bind(
+            .Check(
                 _ =>
                     users
-                        .Register(request.Login, request.Password)
-                        .MapError(error => error.CastTo<RegisterError>())
+                        .GetByLogin(request.Login)
+                        .ToFailure()
+                        .MapError(_ => RegisterError.LoginTaken)
                         .MapError(EnumError.From)
-                        .Map(auth.Authenticate)
-                        .Map(
-                            tokens =>
-                                new RegisterResponse
-                                {
-                                    AccessToken = tokens.AccessToken,
-                                    RefreshToken = tokens.RefreshToken
-                                }
-                        )
+            )
+            .Map(
+                _ =>
+                    new User
+                    {
+                        Login = request.Login,
+                        PasswordHash = request.Password,
+                        DisplayName = request.Login,
+                    }
+            )
+            .Tap(users.Add)
+            .Map(user => new { User = UserDTO.FromUser(user), Tokens = auth.Authenticate(user) })
+            .Map(
+                pair =>
+                    new RegisterResponse
+                    {
+                        AccessToken = pair.Tokens.AccessToken,
+                        RefreshToken = pair.Tokens.RefreshToken,
+                        User = pair.User,
+                    }
             )
             .ToCompletedTask();
     }

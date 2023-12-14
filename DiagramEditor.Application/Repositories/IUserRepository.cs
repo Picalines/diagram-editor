@@ -3,34 +3,13 @@ using DiagramEditor.Domain.Users;
 
 namespace DiagramEditor.Application.Repositories;
 
-public enum UserCreationError
-{
-    LoginTaken,
-}
-
-public enum UserUpdateError
-{
-    LoginTaken,
-}
-
-public sealed record UpdateUserDto
-{
-    public Maybe<string> Login { get; init; }
-
-    public Maybe<string> Password { get; init; }
-
-    public Maybe<string> DisplayName { get; init; }
-
-    public Maybe<Maybe<string>> AvatarUrl { get; init; }
-}
-
 public interface IUserRepository
 {
+    public void Add(User user);
+
     public Maybe<User> GetById(Guid id);
 
     public Maybe<User> GetByLogin(string login);
 
-    public Result<User, UserCreationError> Register(string login, string passwordText);
-
-    public Result<User, UserUpdateError> Update(User user, UpdateUserDto updatedUser);
+    public void Update(User user);
 }
