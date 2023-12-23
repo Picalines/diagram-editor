@@ -17,7 +17,8 @@ internal sealed class RegisterUseCase(
     IAuthenticator auth,
     IUserRepository users,
     ILoginValidator loginValidator,
-    IPasswordValidator passwordValidator
+    IPasswordValidator passwordValidator,
+    IPasswordHasher passwordHasher
 ) : IRegisterUseCase
 {
     public Task<Result<RegisterResponse, EnumError<RegisterError>>> Execute(RegisterRequest request)
@@ -43,7 +44,7 @@ internal sealed class RegisterUseCase(
                     new User
                     {
                         Login = request.Login,
-                        PasswordHash = request.Password,
+                        PasswordHash = passwordHasher.Hash(request.Password),
                         DisplayName = request.Login,
                     }
             )
