@@ -11,6 +11,8 @@ public interface IDiagramEnvironmentRepository
 
     public IEnumerable<DiagramEnvironment> GetAllByDiagram(Diagram diagram);
 
+    public IEnumerable<DiagramEnvironment> GetPublicAndActive();
+
     public void Update(DiagramEnvironment environment);
 
     public void Remove(DiagramEnvironment environment);

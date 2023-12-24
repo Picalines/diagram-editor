@@ -1,5 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 using DiagramEditor.Application.UseCases.Diagrams.Elements.GetAll;
+using DiagramEditor.Application.UseCases.Diagrams.FindPublic;
 using DiagramEditor.Application.UseCases.Diagrams.GetInfo;
 using DiagramEditor.Domain.Diagrams;
 using Microsoft.AspNetCore.Http.HttpResults;
@@ -8,13 +9,14 @@ using Microsoft.AspNetCore.Mvc;
 namespace DiagramEditor.Web.API.Controllers;
 
 [ApiController]
-[Route("diagrams/{environmentId}")]
+[Route("diagrams")]
 public sealed class PublicDiagramsController(
     IGetDiagramInfoUseCase getUseCase,
+    IFindPublicDiagramsUseCase findPublicUseCase,
     IGetAllDiagramElementsUseCase getElementsUseCase
 ) : ControllerBase
 {
-    [HttpGet]
+    [HttpGet("{environmentId}")]
     public async Task<
         Results<Ok<GetDiagramInfoResponse>, BadRequest, NotFound, UnauthorizedHttpResult>
     > GetDiagramById([FromRoute] Guid environmentId) =>
@@ -36,7 +38,22 @@ public sealed class PublicDiagramsController(
                 },
         };
 
-    [HttpGet("elements")]
+    [HttpGet]
+    public async Task<Results<Ok<FindPublicDiagramsResponse>, BadRequest>> FindPublicDiagrams(
+        [FromQuery] string query
+    ) =>
+        await findPublicUseCase.Execute(new FindPublicDiagramsRequest { Query = query }) switch
+        {
+            { IsSuccess: true, Value: var response } => TypedResults.Ok(response),
+            { Error.Error: var error }
+                => error switch
+                {
+                    FindPublicDiagramsError.EmptyQuery => TypedResults.BadRequest(),
+                    _ => throw new NotImplementedException(),
+                },
+        };
+
+    [HttpGet("{environmentId}/elements")]
     public async Task<
         Results<Ok<GetAllDiagramElementsResponse>, BadRequest, NotFound, UnauthorizedHttpResult>
     > GetAllPublicDiagramElements([FromRoute, Required] Guid environmentId) =>

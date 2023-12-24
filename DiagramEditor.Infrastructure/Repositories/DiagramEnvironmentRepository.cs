@@ -34,6 +34,14 @@ internal sealed class DiagramEnvironmentRepository(ApplicationContext context)
             .Where(env => env.Diagram.Id == diagram.Id);
     }
 
+    public IEnumerable<DiagramEnvironment> GetPublicAndActive()
+    {
+        return context
+            .DiagramEnvironments.Include(e => e.Diagram)
+            .ThenInclude(d => d.User)
+            .Where(env => env.IsPublic && env.IsActive);
+    }
+
     public void Update(DiagramEnvironment environment)
     {
         context.DiagramEnvironments.Update(environment);
