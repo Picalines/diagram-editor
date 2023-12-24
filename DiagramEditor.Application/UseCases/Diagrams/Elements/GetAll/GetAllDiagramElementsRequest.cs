@@ -1,10 +1,6 @@
-namespace DiagramEditor.Application.UseCases.Diagrams.Elements.GetAll;
+using DiagramEditor.Domain.Diagrams;
 
-public enum DiagramViewMode
-{
-    InEditor,
-    FromEnvironment,
-}
+namespace DiagramEditor.Application.UseCases.Diagrams.Elements.GetAll;
 
 public sealed record GetAllDiagramElementsRequest
 {

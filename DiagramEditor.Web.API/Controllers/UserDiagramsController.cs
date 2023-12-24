@@ -5,6 +5,7 @@ using DiagramEditor.Application.UseCases.Diagrams.Delete;
 using DiagramEditor.Application.UseCases.Diagrams.GetInfo;
 using DiagramEditor.Application.UseCases.Diagrams.GetOwned;
 using DiagramEditor.Application.UseCases.Diagrams.UpdateInfo;
+using DiagramEditor.Domain.Diagrams;
 using DiagramEditor.Web.API.Controllers.DTOs;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http.HttpResults;
@@ -60,7 +61,9 @@ public sealed class UserDiagramsController(
     public async Task<
         Results<Ok<GetDiagramInfoResponse>, BadRequest, NotFound, UnauthorizedHttpResult>
     > GetDiagramById(Guid id) =>
-        await getUseCase.Execute(new GetDiagramInfoRequest(id)) switch
+        await getUseCase.Execute(
+            new GetDiagramInfoRequest { Id = id, ViewMode = DiagramViewMode.InEditor }
+        ) switch
         {
             { IsSuccess: true, Value: var response } => TypedResults.Ok(response),
             { Error.Error: var error }

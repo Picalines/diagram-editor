@@ -1,6 +1,7 @@
 using DiagramEditor.Application.UseCases.Diagrams.Elements.Create;
 using DiagramEditor.Application.UseCases.Diagrams.Elements.Delete;
 using DiagramEditor.Application.UseCases.Diagrams.Elements.GetAll;
+using DiagramEditor.Domain.Diagrams;
 using DiagramEditor.Web.API.Controllers.DTOs;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http.HttpResults;
