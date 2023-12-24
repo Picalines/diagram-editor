@@ -19,7 +19,7 @@ services:
       - '/api/DiagramEditor.Web.API/obj'
       - './scripts:/api/scripts'
     working_dir: '/api/DiagramEditor.Web.API'
-    command: sh -c "dotnet restore && dotnet tool restore && dotnet watch"
+    command: sh -c "dotnet restore && dotnet tool restore && dotnet watch --non-interactive"
 
 #  web-ui:
 #    image: node:18-alpine
