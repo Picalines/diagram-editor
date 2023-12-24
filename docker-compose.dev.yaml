@@ -21,10 +21,10 @@ services:
     working_dir: '/api/DiagramEditor.Web.API'
     command: sh -c "dotnet restore && dotnet tool restore && dotnet watch --non-interactive"
 
-#  web-ui:
-#    image: node:18-alpine
-#    volumes:
-#      - './web:/app/web'
-#      - '/app/web/node_modules'
-#    working_dir: '/app/web'
-#    command: sh -c "npm ci && npm run dev"
+  web-ui:
+    image: node:21-alpine
+    volumes:
+      - './DiagramEditor.Web.UI:/app/DiagramEditor.Web.UI'
+      - '/app/DiagramEditor.Web.UI/node_modules'
+    working_dir: '/app/DiagramEditor.Web.UI'
+    command: sh -c "npm ci && npm run dev"

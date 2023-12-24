@@ -11,12 +11,12 @@ services:
       - mysql
       - redis
 
-#  web-ui:
-#    ports:
-#      - '8080:5173'
-#    env_file: .env
-#    depends_on:
-#      - api
+  web-ui:
+    ports:
+      - '8080:5173'
+    env_file: .env
+    depends_on:
+      - web-api
 
   mysql:
     image: mysql:8.2.0
