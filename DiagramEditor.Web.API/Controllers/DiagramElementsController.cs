@@ -18,7 +18,7 @@ public sealed class DiagramElementsController(
     [HttpGet]
     public async Task<
         Results<Ok<GetAllDiagramElementsResponse>, BadRequest, NotFound, UnauthorizedHttpResult>
-    > GetAllUserDiagramElements([FromQuery, Required] Guid diagramId) =>
+    > GetAllUserDiagramElements([FromRoute, Required] Guid diagramId) =>
         await getAllUseCase.Execute(
             new GetAllDiagramElementsRequest { Id = diagramId, ViewMode = DiagramViewMode.InEditor }
         ) switch
@@ -38,8 +38,8 @@ public sealed class DiagramElementsController(
     public async Task<
         Results<Ok<CreateDiagramElementResponse>, BadRequest, NotFound, UnauthorizedHttpResult>
     > CreateDiagramElement(
-        [FromBody, Required] CreateDiagramElementRequest request,
-        [FromQuery, Required] Guid diagramId
+        [FromBody] CreateDiagramElementRequest request,
+        [FromRoute] Guid diagramId
     ) =>
         await createUseCase.Execute(request) switch
         {

@@ -24,6 +24,8 @@ internal static class ControllersConfiguration
             };
         });
 
+        mvcBuilder.AddHybridModelBinder();
+
         return services;
     }
 }

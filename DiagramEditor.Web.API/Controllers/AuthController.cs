@@ -1,5 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
-using DiagramEditor.Application;
+﻿using DiagramEditor.Application;
 using DiagramEditor.Application.UseCases.Authentication.Login;
 using DiagramEditor.Application.UseCases.Authentication.Logout;
 using DiagramEditor.Application.UseCases.Authentication.Refresh;
@@ -20,7 +19,7 @@ public sealed class AuthController(
     [AllowAnonymous]
     [HttpPost("login")]
     public async Task<Results<Ok<LoginResponse>, BadRequest, UnauthorizedHttpResult>> Login(
-        [FromBody, Required] LoginRequest request
+        [FromBody] LoginRequest request
     ) =>
         await loginUseCase.Execute(request) switch
         {
@@ -36,7 +35,7 @@ public sealed class AuthController(
     [AllowAnonymous]
     [HttpPost("refresh")]
     public async Task<Results<Ok<RefreshResponse>, BadRequest, ForbidHttpResult>> Refresh(
-        [FromBody, Required] RefreshRequest request
+        [FromBody] RefreshRequest request
     ) =>
         await refreshUseCase.Execute(request) switch
         {

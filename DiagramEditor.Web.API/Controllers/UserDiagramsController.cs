@@ -1,4 +1,3 @@
-using System.ComponentModel.DataAnnotations;
 using CSharpFunctionalExtensions;
 using DiagramEditor.Application;
 using DiagramEditor.Application.Errors;
@@ -7,7 +6,7 @@ using DiagramEditor.Application.UseCases.Diagrams.Delete;
 using DiagramEditor.Application.UseCases.Diagrams.GetInfo;
 using DiagramEditor.Application.UseCases.Diagrams.GetOwned;
 using DiagramEditor.Application.UseCases.Diagrams.UpdateInfo;
-using DiagramEditor.Web.API.Controllers.Requests;
+using HybridModelBinding;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
@@ -44,7 +43,7 @@ public sealed class UserDiagramsController(
     [HttpPost]
     public async Task<
         Results<Ok<CreateDiagramResponse>, BadRequest, UnauthorizedHttpResult>
-    > CreateDiagram([FromBody, Required] CreateDiagramRequest request) =>
+    > CreateDiagram([FromBody] CreateDiagramRequest request) =>
         await createUseCase.Execute(request) switch
         {
             { IsSuccess: true, Value: var response } => TypedResults.Ok(response),
@@ -61,7 +60,7 @@ public sealed class UserDiagramsController(
     [HttpGet("{id}")]
     public async Task<
         Results<Ok<GetDiagramInfoResponse>, BadRequest, NotFound, UnauthorizedHttpResult>
-    > GetDiagramById([FromQuery, Required] Guid id) =>
+    > GetDiagramById(Guid id) =>
         await getUseCase.Execute(new GetDiagramInfoRequest(id)) switch
         {
             { IsSuccess: true, Value: var response } => TypedResults.Ok(response),
@@ -83,18 +82,8 @@ public sealed class UserDiagramsController(
             NotFound,
             UnauthorizedHttpResult
         >
-    > UpdateDiagramById(
-        [FromBody, Required] UpdateDiagramInfoRequestBody requestBody,
-        [FromQuery, Required] Guid id
-    ) =>
-        await updateUseCase.Execute(
-            new UpdateDiagramInfoRequest
-            {
-                Id = id,
-                Name = requestBody.Name.AsMaybe(),
-                Description = requestBody.Description.AsMaybe()
-            }
-        ) switch
+    > UpdateDiagramById(Guid id, [FromHybrid] UpdateDiagramInfoRequest request) =>
+        await updateUseCase.Execute(request) switch
         {
             { IsSuccess: true, Value: var response } => TypedResults.Ok(response),
             { Error: var error }
@@ -111,7 +100,7 @@ public sealed class UserDiagramsController(
     [Authorize]
     [HttpDelete("{id}")]
     public async Task<Results<Ok, BadRequest, NotFound, UnauthorizedHttpResult>> DeleteDiagram(
-        [FromQuery, Required] Guid id
+        Guid id
     ) =>
         await deleteUseCase.Execute(new DeleteDiagramRequest { Id = id }) switch
         {

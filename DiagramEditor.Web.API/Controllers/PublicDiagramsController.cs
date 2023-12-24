@@ -13,7 +13,7 @@ public sealed class PublicDiagramsController(IGetAllDiagramElementsUseCase getEl
     [HttpGet("elements")]
     public async Task<
         Results<Ok<GetAllDiagramElementsResponse>, BadRequest, NotFound, UnauthorizedHttpResult>
-    > GetAllPublicDiagramElements([FromQuery, Required] Guid environmentId) =>
+    > GetAllPublicDiagramElements([FromRoute, Required] Guid environmentId) =>
         await getElementsUseCase.Execute(
             new GetAllDiagramElementsRequest
             {

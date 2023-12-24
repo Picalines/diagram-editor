@@ -1,4 +1,3 @@
-using System.ComponentModel.DataAnnotations;
 using DiagramEditor.Application;
 using DiagramEditor.Application.Errors;
 using DiagramEditor.Application.UseCases.Users.GetCurrent;
@@ -38,7 +37,7 @@ public sealed class CurrentUserController(
             BadRequest<EnumError<UpdateCurrentUserError>?>,
             UnauthorizedHttpResult
         >
-    > EditCurrentUser([FromBody, Required] UpdateCurrentUserRequest request) =>
+    > EditCurrentUser([FromBody] UpdateCurrentUserRequest request) =>
         await updateCurrentUseCase.Execute(request) switch
         {
             { IsSuccess: true, Value: var response } => TypedResults.Ok(response),
