@@ -13,8 +13,7 @@ internal sealed class DiagramEnvironmentRepository(ApplicationContext context)
 {
     public void Add(DiagramEnvironment environment)
     {
-        context.Diagrams.Attach(environment.Diagram);
-        context.DiagramEnvironments.Add(environment);
+        context.DiagramEnvironments.Attach(environment);
         context.SaveChanges();
     }
 

@@ -13,8 +13,7 @@ internal sealed class DiagramRepository(ApplicationContext context) : IDiagramRe
 {
     public void Add(Diagram diagram)
     {
-        context.Users.Attach(diagram.User);
-        context.Diagrams.Add(diagram);
+        context.Diagrams.Attach(diagram);
         context.SaveChanges();
     }
 

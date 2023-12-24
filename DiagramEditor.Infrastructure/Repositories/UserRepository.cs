@@ -11,7 +11,7 @@ internal sealed class UserRepository(ApplicationContext context) : IUserReposito
 {
     public void Add(User user)
     {
-        context.Users.Add(user);
+        context.Users.Attach(user);
         context.SaveChanges();
     }
 

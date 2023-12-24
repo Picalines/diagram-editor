@@ -13,9 +13,7 @@ internal sealed class DiagramElementRepository(ApplicationContext context)
 {
     public void Add(DiagramElement element)
     {
-        context.Users.Attach(element.Diagram.User);
-        context.Diagrams.Attach(element.Diagram);
-        context.DiagramElements.Add(element);
+        context.DiagramElements.Attach(element);
         context.SaveChanges();
     }
 
@@ -23,6 +21,7 @@ internal sealed class DiagramElementRepository(ApplicationContext context)
     {
         return context
             .DiagramElements.Include(e => e.Diagram)
+            .ThenInclude(d => d.User)
             .SingleOrDefault(element => element.Id == id)
             .AsMaybe();
     }
@@ -31,6 +30,7 @@ internal sealed class DiagramElementRepository(ApplicationContext context)
     {
         return context
             .DiagramElements.Include(e => e.Diagram)
+            .ThenInclude(d => d.User)
             .Where(element => element.Diagram.Id == diagram.Id);
     }
 

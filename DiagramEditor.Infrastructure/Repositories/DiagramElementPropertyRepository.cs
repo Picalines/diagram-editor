@@ -12,13 +12,7 @@ internal sealed class DiagramElementPropertyRepository(ApplicationContext contex
 {
     public void AddRange(IEnumerable<DiagramElementProperty> properties)
     {
-        // TODO: yeah.
-        properties
-            .FirstOrDefault()
-            .AsMaybe()
-            .Execute(p => context.DiagramElements.Attach(p.Element));
-
-        context.DiagramElementProperties.AddRange(properties);
+        context.DiagramElementProperties.AttachRange(properties);
         context.SaveChanges();
     }
 

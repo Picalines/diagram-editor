@@ -84,8 +84,6 @@ internal sealed class MaybeJsonConverter : JsonConverterFactory
             JsonSerializerOptions options
         )
         {
-            Console.WriteLine(typeToConvert.FullName);
-            Console.WriteLine(typeof(T));
             return reader.TokenType switch
             {
                 JsonTokenType.Null => Maybe.None,
