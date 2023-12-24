@@ -71,7 +71,11 @@ internal sealed class MaybeJsonConverter : JsonConverterFactory
 
         public MaybeJsonConverterInner(JsonSerializerOptions options)
         {
-            _valueConverter = (JsonConverter<T>)options.GetConverter(typeof(T));
+            _valueConverter =
+                options.GetConverter(typeof(T)) as JsonConverter<T>
+                ?? throw new NotImplementedException(
+                    $"{nameof(JsonConverter<T>)} was not found for {nameof(MaybeJsonConverter)}"
+                );
         }
 
         public override Maybe<T?> Read(
@@ -80,10 +84,12 @@ internal sealed class MaybeJsonConverter : JsonConverterFactory
             JsonSerializerOptions options
         )
         {
+            Console.WriteLine(typeToConvert.FullName);
+            Console.WriteLine(typeof(T));
             return reader.TokenType switch
             {
                 JsonTokenType.Null => Maybe.None,
-                _ => Maybe.From(_valueConverter.Read(ref reader, typeToConvert, options)),
+                _ => Maybe.From(_valueConverter.Read(ref reader, typeof(T), options)),
             };
         }
 
