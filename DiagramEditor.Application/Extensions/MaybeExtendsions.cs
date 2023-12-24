@@ -29,11 +29,6 @@ public static class MaybeExtensions
         return errorMaybe.ToFailure(Unit.Instance);
     }
 
-    public static Result<T, E> Check<T, E>(this T value, Func<T, Maybe<E>> operation)
-    {
-        return operation(value).ToFailure(value);
-    }
-
     public static Maybe<T> Tap<T>(this Maybe<T> maybe, Action<T> sideEffect)
     {
         maybe.Execute(sideEffect);

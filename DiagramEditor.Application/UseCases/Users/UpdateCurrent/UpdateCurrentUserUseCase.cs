@@ -26,9 +26,8 @@ internal sealed class UpdateCurrentUserUseCase(
     )
     {
         return request
-            .Login
-            .Bind(loginValidator.Validate)
-            .Bind(_ => request.Password.Bind(passwordValidator.Validate))
+            .Login.Bind(loginValidator.Validate)
+            .Or(() => request.Password.Bind(passwordValidator.Validate))
             .ToFailure()
             .MapError(
                 validationError =>
@@ -37,8 +36,7 @@ internal sealed class UpdateCurrentUserUseCase(
             .Check(
                 _ =>
                     request
-                        .Login
-                        .Bind(users.GetByLogin)
+                        .Login.Bind(users.GetByLogin)
                         .ToFailure()
                         .MapError(_ => UpdateCurrentUserError.LoginTaken)
                         .MapError(EnumError.From)
@@ -47,11 +45,11 @@ internal sealed class UpdateCurrentUserUseCase(
                 _ =>
                     auth.GetAuthenticatedUser()
                         .ToResult(UpdateCurrentUserError.Unauthorized)
+                        .MapError(EnumError.From)
                         .Tap(user => AssignUserFields(user, request))
                         .Tap(users.Update)
                         .Map(UserDTO.FromUser)
                         .Map(userDto => new UpdateCurrentUserResponse(userDto))
-                        .MapError(EnumError.From)
             )
             .ToCompletedTask();
     }
@@ -64,8 +62,8 @@ internal sealed class UpdateCurrentUserUseCase(
 
         request.DisplayName.Execute(displayName => user.DisplayName = displayName);
 
-        request
-            .AvatarUrl
-            .Execute(avatarUrl => user.AvatarUrl = avatarUrl.Length > 0 ? avatarUrl : null);
+        request.AvatarUrl.Execute(
+            avatarUrl => user.AvatarUrl = avatarUrl.Length > 0 ? avatarUrl : null
+        );
     }
 }

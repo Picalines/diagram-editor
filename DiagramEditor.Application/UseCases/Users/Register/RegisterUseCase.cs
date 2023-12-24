@@ -25,7 +25,7 @@ internal sealed class RegisterUseCase(
     {
         return loginValidator
             .Validate(request.Login)
-            .Bind(_ => passwordValidator.Validate(request.Password))
+            .Or(() => passwordValidator.Validate(request.Password))
             .ToFailure()
             .MapError(
                 validationError =>
