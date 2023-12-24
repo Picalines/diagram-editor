@@ -32,13 +32,6 @@ public sealed class ApplicationContext : DbContext
         }
     }
 
-    protected override void OnModelCreating(ModelBuilder modelBuilder)
-    {
-        modelBuilder.Entity<User>().HasMany<Diagram>().WithOne(d => d.Creator).IsRequired();
-
-        modelBuilder.Entity<Diagram>().HasOne(e => e.Creator).WithMany().IsRequired();
-    }
-
     protected override void OnConfiguring(DbContextOptionsBuilder options)
     {
         var mySqlConnectionString = CreateConnectionString(

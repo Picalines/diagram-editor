@@ -11,8 +11,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace DiagramEditor.Infrastructure.Migrations
 {
     [DbContext(typeof(ApplicationContext))]
-    [Migration("20231214235658_Refactor")]
-    partial class Refactor
+    [Migration("20231224121604_Initial")]
+    partial class Initial
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -31,9 +31,6 @@ namespace DiagramEditor.Infrastructure.Migrations
                     b.Property<DateTime>("CreatedDate")
                         .HasColumnType("datetime(6)");
 
-                    b.Property<Guid>("CreatorId")
-                        .HasColumnType("char(36)");
-
                     b.Property<string>("Description")
                         .IsRequired()
                         .HasColumnType("longtext");
@@ -45,9 +42,12 @@ namespace DiagramEditor.Infrastructure.Migrations
                     b.Property<DateTime>("UpdatedDate")
                         .HasColumnType("datetime(6)");
 
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("char(36)");
+
                     b.HasKey("Id");
 
-                    b.HasIndex("CreatorId");
+                    b.HasIndex("UserId");
 
                     b.ToTable("Diagrams");
                 });
@@ -160,13 +160,13 @@ namespace DiagramEditor.Infrastructure.Migrations
 
             modelBuilder.Entity("DiagramEditor.Domain.Diagrams.Diagram", b =>
                 {
-                    b.HasOne("DiagramEditor.Domain.Users.User", "Creator")
+                    b.HasOne("DiagramEditor.Domain.Users.User", "User")
                         .WithMany()
-                        .HasForeignKey("CreatorId")
+                        .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("Creator");
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("DiagramEditor.Domain.Diagrams.DiagramElement", b =>

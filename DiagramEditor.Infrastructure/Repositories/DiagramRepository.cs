@@ -12,6 +12,7 @@ internal sealed class DiagramRepository(ApplicationContext context) : IDiagramRe
 {
     public void Add(Diagram diagram)
     {
+        context.Users.Attach(diagram.User);
         context.Diagrams.Add(diagram);
         context.SaveChanges();
     }
@@ -23,7 +24,7 @@ internal sealed class DiagramRepository(ApplicationContext context) : IDiagramRe
 
     public IEnumerable<Diagram> GetCreatedByUser(User user)
     {
-        return context.Diagrams.Where(diagram => diagram.Creator.Id == user.Id);
+        return context.Diagrams.Where(diagram => diagram.User.Id == user.Id);
     }
 
     public void Update(Diagram diagram)
