@@ -22,6 +22,7 @@ internal sealed class DiagramEnvironmentRepository(ApplicationContext context)
     {
         return context
             .DiagramEnvironments.Include(e => e.Diagram)
+            .ThenInclude(d => d.User)
             .SingleOrDefault(env => env.Id == id)
             .AsMaybe();
     }

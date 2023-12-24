@@ -1,4 +1,5 @@
 using DiagramEditor.Application.UseCases.Diagrams.Environments.Create;
+using DiagramEditor.Application.UseCases.Diagrams.Environments.Update;
 using DiagramEditor.Web.API.Controllers.DTOs;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http.HttpResults;
@@ -8,14 +9,16 @@ namespace DiagramEditor.Web.API.Controllers;
 
 [ApiController]
 [Route("user/diagrams/{diagramId}/environments")]
-public sealed class DiagramEnvironmentsController(ICreateDiagramEnvironmentUseCase createUseCase)
-    : ControllerBase
+public sealed class DiagramEnvironmentsController(
+    ICreateDiagramEnvironmentUseCase createUseCase,
+    IUpdateDiagramEnvironmentUseCase updateUseCase
+) : ControllerBase
 {
     [Authorize]
     [HttpPost]
     public async Task<
         Results<Ok<CreateDiagramEnvironmentResponse>, BadRequest, NotFound, UnauthorizedHttpResult>
-    > GetAllUserDiagramElements(
+    > CreateDiagramEnvironment(
         [FromRoute] Guid diagramId,
         [FromBody] CreateDiagramEnvironmentRequestDTO request
     ) =>
@@ -33,6 +36,34 @@ public sealed class DiagramEnvironmentsController(ICreateDiagramEnvironmentUseCa
                 {
                     CreateDiagramEnvironmentError.DiagramNotFound => TypedResults.NotFound(),
                     CreateDiagramEnvironmentError.Unauthorized => TypedResults.Unauthorized(),
+                    _ => throw new NotImplementedException(),
+                },
+        };
+
+    [Authorize]
+    [HttpPut("{id}")]
+    public async Task<
+        Results<Ok<UpdateDiagramEnvironmentResponse>, BadRequest, NotFound, UnauthorizedHttpResult>
+    > UpdateDiagramEnvironment(
+        [FromRoute] Guid diagramId,
+        [FromRoute] Guid id,
+        UpdateDiagramEnvironmentRequestDTO request
+    ) =>
+        await updateUseCase.Execute(
+            new UpdateDiagramEnvironmentRequest
+            {
+                Id = id,
+                IsActive = request.IsActive,
+                ViewsCount = request.ViewsCount
+            }
+        ) switch
+        {
+            { IsSuccess: true, Value: var value } => TypedResults.Ok(value),
+            { Error.Error: var error }
+                => error switch
+                {
+                    UpdateDiagramEnvironmentError.NotFound => TypedResults.NotFound(),
+                    UpdateDiagramEnvironmentError.Unauthorized => TypedResults.Unauthorized(),
                     _ => throw new NotImplementedException(),
                 },
         };
