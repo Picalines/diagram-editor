@@ -6,7 +6,7 @@ public sealed record DiagramDTO
 {
     public required Guid Id { get; init; }
 
-    public required Guid CreatorId { get; init; }
+    public required Guid UserId { get; init; }
 
     public required string Name { get; init; }
 
@@ -18,7 +18,7 @@ public sealed record DiagramDTO
         new DiagramDTO
         {
             Id = diagram.Id,
-            CreatorId = diagram.Creator.Id,
+            UserId = diagram.User.Id,
             Name = diagram.Name,
             Description = diagram.Description,
             UpdatedDate = diagram.UpdatedDate,

@@ -23,7 +23,7 @@ internal sealed class GetDiagramInfoUseCase(IDiagramRepository diagrams, IAuthen
                 user =>
                     diagrams
                         .GetById(request.Id)
-                        .Where(diagram => diagram.Creator.Id == request.Id)
+                        .Where(diagram => diagram.User.Id == user.Id)
                         .ToResult(GetDiagramInfoError.NotFound)
                         .Map(DiagramDTO.FromDiagram)
                         .Map(diagramDto => new GetDiagramInfoResponse(diagramDto))

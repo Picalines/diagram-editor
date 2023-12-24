@@ -47,7 +47,7 @@ internal sealed class GetAllDiagramElementsUseCase(
                         user =>
                             diagrams
                                 .GetById(request.Id)
-                                .Where(diagram => diagram.Creator.Id == user.Id)
+                                .Where(diagram => diagram.User.Id == user.Id)
                                 .ToResult(GetAllDiagramElementsError.DiagramNotFound)
                     ),
 

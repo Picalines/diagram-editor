@@ -28,7 +28,7 @@ internal sealed class CreateDiagramElementUseCase(
                 user =>
                     diagrams
                         .GetById(request.DiagramId)
-                        .Where(diagram => diagram.Creator.Id == user.Id)
+                        .Where(diagram => diagram.User.Id == user.Id)
                         .ToResult(CreateDiagramElementError.DiagramNotFound)
                         .Map(
                             diagram =>

@@ -38,7 +38,7 @@ internal sealed class CreateDiagramUseCase(
                             user =>
                                 new Diagram
                                 {
-                                    Creator = user,
+                                    User = user,
                                     Name = request.Name,
                                     Description = request.Description.GetValueOrDefault(""),
                                 }
