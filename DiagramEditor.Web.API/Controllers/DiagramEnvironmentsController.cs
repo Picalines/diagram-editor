@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace DiagramEditor.Web.API.Controllers;
 
 [ApiController]
-[Route("user/diagrams/{diagramId}/envrionments")]
+[Route("user/diagrams/{diagramId}/environments")]
 public sealed class DiagramEnvironmentsController(ICreateDiagramEnvironmentUseCase createUseCase)
     : ControllerBase
 {
