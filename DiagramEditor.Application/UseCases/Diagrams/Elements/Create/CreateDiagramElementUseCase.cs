@@ -41,6 +41,20 @@ internal sealed class CreateDiagramElementUseCase(
                                 }
                         )
                         .Tap(elements.Add)
+                        .Tap(
+                            element =>
+                                properties.AddRange(
+                                    request.Properties.Select(
+                                        property =>
+                                            new DiagramElementProperty
+                                            {
+                                                Element = element,
+                                                Key = property.Key,
+                                                Value = property.Value
+                                            }
+                                    )
+                                )
+                        )
                         .Map(element => DiagramElementDTO.Create(element, properties))
                         .Map(elementDto => new CreateDiagramElementResponse(elementDto))
             )

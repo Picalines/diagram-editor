@@ -1,3 +1,4 @@
+using CSharpFunctionalExtensions;
 using DiagramEditor.Application.Attributes;
 using DiagramEditor.Application.Repositories;
 using DiagramEditor.Domain.Diagrams;
@@ -11,15 +12,21 @@ internal sealed class DiagramElementPropertyRepository(ApplicationContext contex
 {
     public void AddRange(IEnumerable<DiagramElementProperty> properties)
     {
+        // TODO: yeah.
+        properties
+            .FirstOrDefault()
+            .AsMaybe()
+            .Execute(p => context.DiagramElements.Attach(p.Element));
+
         context.DiagramElementProperties.AddRange(properties);
         context.SaveChanges();
     }
 
     public IEnumerable<DiagramElementProperty> GetAllByElement(DiagramElement element)
     {
-        return context
-            .DiagramElementProperties
-            .Where(property => property.Element.Id == element.Id);
+        return context.DiagramElementProperties.Where(
+            property => property.Element.Id == element.Id
+        );
     }
 
     public void UpdateRange(IEnumerable<DiagramElementProperty> properties)

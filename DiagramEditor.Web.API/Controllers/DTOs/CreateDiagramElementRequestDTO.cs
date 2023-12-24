@@ -1,11 +1,9 @@
 using DiagramEditor.Domain.Diagrams;
 
-namespace DiagramEditor.Application.UseCases.Diagrams.Elements.Create;
+namespace DiagramEditor.Web.API.Controllers.DTOs;
 
-public sealed record CreateDiagramElementRequest
+public sealed record CreateDiagramElementRequestDTO
 {
-    public required Guid DiagramId { get; init; }
-
     public required DiagramElementType Type { get; init; }
 
     public required float OriginX { get; init; }

@@ -1,6 +1,6 @@
-using System.ComponentModel.DataAnnotations;
 using DiagramEditor.Application.UseCases.Diagrams.Elements.Create;
 using DiagramEditor.Application.UseCases.Diagrams.Elements.GetAll;
+using DiagramEditor.Web.API.Controllers.DTOs;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
@@ -38,10 +38,19 @@ public sealed class DiagramElementsController(
     public async Task<
         Results<Ok<CreateDiagramElementResponse>, BadRequest, NotFound, UnauthorizedHttpResult>
     > CreateDiagramElement(
-        [FromBody] CreateDiagramElementRequest request,
-        [FromRoute] Guid diagramId
+        [FromRoute] Guid diagramId,
+        [FromBody] CreateDiagramElementRequestDTO request
     ) =>
-        await createUseCase.Execute(request) switch
+        await createUseCase.Execute(
+            new CreateDiagramElementRequest
+            {
+                DiagramId = diagramId,
+                Type = request.Type,
+                OriginX = request.OriginX,
+                OriginY = request.OriginY,
+                Properties = request.Properties
+            }
+        ) switch
         {
             { IsSuccess: true, Value: var value } => TypedResults.Ok(value),
             { Error.Error: var error }

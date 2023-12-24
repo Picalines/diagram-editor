@@ -2,6 +2,7 @@ using CSharpFunctionalExtensions;
 using DiagramEditor.Application.Attributes;
 using DiagramEditor.Application.Repositories;
 using DiagramEditor.Domain.Diagrams;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace DiagramEditor.Infrastructure.Repositories;
@@ -12,18 +13,25 @@ internal sealed class DiagramElementRepository(ApplicationContext context)
 {
     public void Add(DiagramElement element)
     {
+        context.Users.Attach(element.Diagram.User);
+        context.Diagrams.Attach(element.Diagram);
         context.DiagramElements.Add(element);
         context.SaveChanges();
     }
 
     public Maybe<DiagramElement> GetById(Guid id)
     {
-        return context.DiagramElements.SingleOrDefault(element => element.Id == id).AsMaybe();
+        return context
+            .DiagramElements.Include(e => e.Diagram)
+            .SingleOrDefault(element => element.Id == id)
+            .AsMaybe();
     }
 
     public IEnumerable<DiagramElement> GetAllByDiagram(Diagram diagram)
     {
-        return context.DiagramElements.Where(element => element.Diagram.Id == diagram.Id);
+        return context
+            .DiagramElements.Include(e => e.Diagram)
+            .Where(element => element.Diagram.Id == diagram.Id);
     }
 
     public void Update(DiagramElement element)
