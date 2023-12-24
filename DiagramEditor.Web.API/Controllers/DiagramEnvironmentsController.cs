@@ -1,4 +1,5 @@
 using DiagramEditor.Application.UseCases.Diagrams.Environments.Create;
+using DiagramEditor.Application.UseCases.Diagrams.Environments.GetAll;
 using DiagramEditor.Application.UseCases.Diagrams.Environments.Update;
 using DiagramEditor.Web.API.Controllers.DTOs;
 using Microsoft.AspNetCore.Authorization;
@@ -10,10 +11,30 @@ namespace DiagramEditor.Web.API.Controllers;
 [ApiController]
 [Route("user/diagrams/{diagramId}/environments")]
 public sealed class DiagramEnvironmentsController(
+    IGetAllDiagramEnvironmentsUseCase getAllUseCase,
     ICreateDiagramEnvironmentUseCase createUseCase,
     IUpdateDiagramEnvironmentUseCase updateUseCase
 ) : ControllerBase
 {
+    [Authorize]
+    [HttpGet]
+    public async Task<
+        Results<Ok<GetAllDiagramEnvironmentsResponse>, BadRequest, NotFound, UnauthorizedHttpResult>
+    > GetDiagramEnvironments([FromRoute] Guid diagramId) =>
+        await getAllUseCase.Execute(
+            new GetAllDiagramEnvironmentsRequest { DiagramId = diagramId }
+        ) switch
+        {
+            { IsSuccess: true, Value: var value } => TypedResults.Ok(value),
+            { Error.Error: var error }
+                => error switch
+                {
+                    GetAllDiagramEnvironmentsError.DiagramNotFound => TypedResults.NotFound(),
+                    GetAllDiagramEnvironmentsError.Unauthorized => TypedResults.Unauthorized(),
+                    _ => throw new NotImplementedException(),
+                },
+        };
+
     [Authorize]
     [HttpPost]
     public async Task<
