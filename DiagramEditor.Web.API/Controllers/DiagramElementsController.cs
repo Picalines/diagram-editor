@@ -1,4 +1,5 @@
 using DiagramEditor.Application.UseCases.Diagrams.Elements.Create;
+using DiagramEditor.Application.UseCases.Diagrams.Elements.Delete;
 using DiagramEditor.Application.UseCases.Diagrams.Elements.GetAll;
 using DiagramEditor.Web.API.Controllers.DTOs;
 using Microsoft.AspNetCore.Authorization;
@@ -11,7 +12,8 @@ namespace DiagramEditor.Web.API.Controllers;
 [Route("user/diagrams/{diagramId}/elements")]
 public sealed class DiagramElementsController(
     IGetAllDiagramElementsUseCase getAllUseCase,
-    ICreateDiagramElementUseCase createUseCase
+    ICreateDiagramElementUseCase createUseCase,
+    IDeleteDiagramElementUseCase deleteUseCase
 ) : ControllerBase
 {
     [Authorize]
@@ -58,6 +60,23 @@ public sealed class DiagramElementsController(
                 {
                     CreateDiagramElementError.DiagramNotFound => TypedResults.NotFound(),
                     CreateDiagramElementError.Unauthorized => TypedResults.Unauthorized(),
+                    _ => throw new NotImplementedException(),
+                }
+        };
+
+    [Authorize]
+    [HttpDelete("{id}")]
+    public async Task<
+        Results<Ok, BadRequest, NotFound, UnauthorizedHttpResult>
+    > DeleteDiagramElement([FromRoute] Guid diagramId, [FromRoute] Guid id) =>
+        await deleteUseCase.Execute(new DeleteDiagramElementRequest { Id = id }) switch
+        {
+            { IsSuccess: true } => TypedResults.Ok(),
+            { Error.Error: var error }
+                => error switch
+                {
+                    DeleteDiagramElementError.NotFound => TypedResults.NotFound(),
+                    DeleteDiagramElementError.Unauthorized => TypedResults.Unauthorized(),
                     _ => throw new NotImplementedException(),
                 }
         };

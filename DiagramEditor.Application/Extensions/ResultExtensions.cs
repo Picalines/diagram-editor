@@ -24,8 +24,8 @@ public static class ResultExtensions
         return error;
     }
 
-    public static Result<Unit, E> ToResult<E>(this bool statusFlag, E falseValue)
+    public static Result<T, E> ToResult<T, E>(this bool statusFlag, T trueValue, E falseValue)
     {
-        return statusFlag ? Unit.Instance : falseValue;
+        return statusFlag ? trueValue : falseValue;
     }
 }
