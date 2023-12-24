@@ -11,8 +11,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace DiagramEditor.Infrastructure.Migrations
 {
     [DbContext(typeof(ApplicationContext))]
-    [Migration("20231224121604_Initial")]
-    partial class Initial
+    [Migration("20231224144015_Initial2")]
+    partial class Initial2
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -111,6 +111,9 @@ namespace DiagramEditor.Infrastructure.Migrations
                         .HasColumnType("char(36)");
 
                     b.Property<bool>("IsActive")
+                        .HasColumnType("tinyint(1)");
+
+                    b.Property<bool>("IsPublic")
                         .HasColumnType("tinyint(1)");
 
                     b.Property<int>("ViewsCount")

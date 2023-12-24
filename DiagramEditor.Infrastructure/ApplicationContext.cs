@@ -32,19 +32,6 @@ public sealed class ApplicationContext : DbContext
         }
     }
 
-    protected override void OnModelCreating(ModelBuilder modelBuilder)
-    {
-        base.OnModelCreating(modelBuilder);
-
-        modelBuilder.Entity<Diagram>().Navigation(e => e.User).AutoInclude();
-
-        modelBuilder.Entity<DiagramElement>().Navigation(e => e.Diagram).AutoInclude();
-
-        modelBuilder.Entity<DiagramElementProperty>().Navigation(e => e.Element).AutoInclude();
-
-        modelBuilder.Entity<DiagramEnvironment>().Navigation(e => e.Diagram).AutoInclude();
-    }
-
     protected override void OnConfiguring(DbContextOptionsBuilder options)
     {
         var mySqlConnectionString = CreateConnectionString(

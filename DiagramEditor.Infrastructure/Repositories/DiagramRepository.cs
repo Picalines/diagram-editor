@@ -3,6 +3,7 @@ using DiagramEditor.Application.Attributes;
 using DiagramEditor.Application.Repositories;
 using DiagramEditor.Domain.Diagrams;
 using DiagramEditor.Domain.Users;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace DiagramEditor.Infrastructure;
@@ -19,12 +20,15 @@ internal sealed class DiagramRepository(ApplicationContext context) : IDiagramRe
 
     public Maybe<Diagram> GetById(Guid id)
     {
-        return context.Diagrams.SingleOrDefault(diagram => diagram.Id == id).AsMaybe();
+        return context
+            .Diagrams.Include(d => d.User)
+            .SingleOrDefault(diagram => diagram.Id == id)
+            .AsMaybe();
     }
 
     public IEnumerable<Diagram> GetCreatedByUser(User user)
     {
-        return context.Diagrams.Where(diagram => diagram.User.Id == user.Id);
+        return context.Diagrams.Include(d => d.User).Where(diagram => diagram.User.Id == user.Id);
     }
 
     public void Update(Diagram diagram)
