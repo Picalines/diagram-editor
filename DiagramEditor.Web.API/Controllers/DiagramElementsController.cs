@@ -1,6 +1,7 @@
 using DiagramEditor.Application.UseCases.Diagrams.Elements.Create;
 using DiagramEditor.Application.UseCases.Diagrams.Elements.Delete;
 using DiagramEditor.Application.UseCases.Diagrams.Elements.GetAll;
+using DiagramEditor.Application.UseCases.Diagrams.Elements.UseCase;
 using DiagramEditor.Domain.Diagrams;
 using DiagramEditor.Web.API.Controllers.DTOs;
 using Microsoft.AspNetCore.Authorization;
@@ -14,6 +15,7 @@ namespace DiagramEditor.Web.API.Controllers;
 public sealed class DiagramElementsController(
     IGetAllDiagramElementsUseCase getAllUseCase,
     ICreateDiagramElementUseCase createUseCase,
+    IUpdateDiagramElementUseCase updateUseCase,
     IDeleteDiagramElementUseCase deleteUseCase
 ) : ControllerBase
 {
@@ -66,10 +68,38 @@ public sealed class DiagramElementsController(
         };
 
     [Authorize]
+    [HttpPut("{id}")]
+    public async Task<
+        Results<Ok<UpdateDiagramElementResponse>, BadRequest, NotFound, UnauthorizedHttpResult>
+    > UpdateDiagramElement(
+        [FromRoute] Guid id,
+        [FromBody] UpdateDiagramElementRequestDTO request
+    ) =>
+        await updateUseCase.Execute(
+            new UpdateDiagramElementRequest
+            {
+                Id = id,
+                OriginX = request.OriginX,
+                OriginY = request.OriginY,
+                Properties = request.Properties
+            }
+        ) switch
+        {
+            { IsSuccess: true, Value: var value } => TypedResults.Ok(value),
+            { Error.Error: var error }
+                => error switch
+                {
+                    UpdateDiagramElementError.NotFound => TypedResults.NotFound(),
+                    UpdateDiagramElementError.Unauthorized => TypedResults.Unauthorized(),
+                    _ => throw new NotImplementedException(),
+                }
+        };
+
+    [Authorize]
     [HttpDelete("{id}")]
     public async Task<
         Results<Ok, BadRequest, NotFound, UnauthorizedHttpResult>
-    > DeleteDiagramElement([FromRoute] Guid diagramId, [FromRoute] Guid id) =>
+    > DeleteDiagramElement([FromRoute] Guid id) =>
         await deleteUseCase.Execute(new DeleteDiagramElementRequest { Id = id }) switch
         {
             { IsSuccess: true } => TypedResults.Ok(),

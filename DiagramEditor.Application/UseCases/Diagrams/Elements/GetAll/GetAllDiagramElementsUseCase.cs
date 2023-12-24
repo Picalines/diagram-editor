@@ -27,7 +27,7 @@ internal sealed class GetAllDiagramElementsUseCase(
             .Map(elements.GetAllByDiagram)
             .Map(
                 elements =>
-                    elements.Select(element => DiagramElementDTO.Create(element, properties))
+                    elements.Select(element => DiagramElementDTO.FromElement(element, properties))
             )
             .Map(elementDtos => new GetAllDiagramElementsResponse(elementDtos.ToArray()))
             .MapError(EnumError.From)

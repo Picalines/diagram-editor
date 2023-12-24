@@ -17,7 +17,7 @@ public sealed record DiagramElementDTO
 
     public required IReadOnlyDictionary<string, string> Properties { get; init; }
 
-    public static DiagramElementDTO Create(
+    public static DiagramElementDTO FromElement(
         DiagramElement element,
         IReadOnlyDictionary<string, string> properties
     ) =>
@@ -31,9 +31,9 @@ public sealed record DiagramElementDTO
             Properties = properties,
         };
 
-    public static DiagramElementDTO Create(
+    public static DiagramElementDTO FromElement(
         DiagramElement element,
         IDiagramElementPropertyRepository properties
     ) =>
-        Create(element, properties.GetAllByElement(element).ToDictionary(e => e.Key, e => e.Value));
+        FromElement(element, properties.GetAllByElement(element).ToDictionary(e => e.Key, e => e.Value));
 }

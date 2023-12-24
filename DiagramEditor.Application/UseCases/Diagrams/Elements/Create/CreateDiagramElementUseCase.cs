@@ -55,7 +55,7 @@ internal sealed class CreateDiagramElementUseCase(
                                     )
                                 )
                         )
-                        .Map(element => DiagramElementDTO.Create(element, properties))
+                        .Map(element => DiagramElementDTO.FromElement(element, properties))
                         .Map(elementDto => new CreateDiagramElementResponse(elementDto))
             )
             .MapError(EnumError.From)
