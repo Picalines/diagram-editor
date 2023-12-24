@@ -33,7 +33,8 @@ internal sealed class CreateDiagramEnvironmentUseCase(
                                 new DiagramEnvironment
                                 {
                                     Diagram = diagram,
-                                    IsActive = false,
+                                    IsPublic = request.IsPublic,
+                                    IsActive = true,
                                     ViewsCount = 0,
                                 }
                         )

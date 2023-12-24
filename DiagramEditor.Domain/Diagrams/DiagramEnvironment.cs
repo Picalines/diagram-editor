@@ -8,5 +8,7 @@ public sealed class DiagramEnvironment
 
     public required bool IsActive { get; set; }
 
+    public required bool IsPublic { get; set; }
+
     public required int ViewsCount { get; set; }
 }

@@ -1,4 +1,3 @@
-using CSharpFunctionalExtensions;
 using DiagramEditor.Application;
 using DiagramEditor.Application.Errors;
 using DiagramEditor.Application.UseCases.Diagrams.Create;
@@ -6,7 +5,7 @@ using DiagramEditor.Application.UseCases.Diagrams.Delete;
 using DiagramEditor.Application.UseCases.Diagrams.GetInfo;
 using DiagramEditor.Application.UseCases.Diagrams.GetOwned;
 using DiagramEditor.Application.UseCases.Diagrams.UpdateInfo;
-using HybridModelBinding;
+using DiagramEditor.Web.API.Controllers.DTOs;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
@@ -82,8 +81,15 @@ public sealed class UserDiagramsController(
             NotFound,
             UnauthorizedHttpResult
         >
-    > UpdateDiagramById(Guid id, [FromHybrid] UpdateDiagramInfoRequest request) =>
-        await updateUseCase.Execute(request) switch
+    > UpdateDiagramById(Guid id, UpdateDiagramInfoRequestDTO request) =>
+        await updateUseCase.Execute(
+            new UpdateDiagramInfoRequest
+            {
+                Id = id,
+                Name = request.Name,
+                Description = request.Description
+            }
+        ) switch
         {
             { IsSuccess: true, Value: var response } => TypedResults.Ok(response),
             { Error: var error }

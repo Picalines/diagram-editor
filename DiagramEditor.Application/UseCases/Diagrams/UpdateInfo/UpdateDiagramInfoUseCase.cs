@@ -22,8 +22,7 @@ internal sealed class UpdateDiagramInfoUseCase(
     )
     {
         return request
-            .Name
-            .Bind(nameValidator.Validate)
+            .Name.Bind(nameValidator.Validate)
             .ToFailure()
             .MapError(
                 validationError =>

@@ -1,5 +1,5 @@
 using DiagramEditor.Application.UseCases.Diagrams.Environments.Create;
-using HybridModelBinding;
+using DiagramEditor.Web.API.Controllers.DTOs;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
@@ -15,8 +15,17 @@ public sealed class DiagramEnvironmentsController(ICreateDiagramEnvironmentUseCa
     [HttpPost]
     public async Task<
         Results<Ok<CreateDiagramEnvironmentResponse>, BadRequest, NotFound, UnauthorizedHttpResult>
-    > GetAllUserDiagramElements([FromHybrid] CreateDiagramEnvironmentRequest request) =>
-        await createUseCase.Execute(request) switch
+    > GetAllUserDiagramElements(
+        [FromRoute] Guid diagramId,
+        [FromBody] CreateDiagramEnvironmentRequestDTO request
+    ) =>
+        await createUseCase.Execute(
+            new CreateDiagramEnvironmentRequest
+            {
+                DiagramId = diagramId,
+                IsPublic = request.IsPublic
+            }
+        ) switch
         {
             { IsSuccess: true, Value: var value } => TypedResults.Ok(value),
             { Error.Error: var error }
