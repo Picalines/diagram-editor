@@ -1,0 +1,11 @@
+html,
+body {
+	@apply h-full overflow-hidden;
+}
+
+:root [data-theme='crimson'] {
+	--theme-font-family-base: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono',
+		'Courier New', monospace;
+	--theme-font-family-heading: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
+		'Liberation Mono', 'Courier New', monospace;
+}
